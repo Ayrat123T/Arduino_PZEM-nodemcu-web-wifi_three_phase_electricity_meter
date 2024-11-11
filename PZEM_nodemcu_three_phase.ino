@@ -18,7 +18,6 @@ ESP8266WebServer server(80);
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-
 PZEM004Tv30 pzem1(D1, D2); // (RX,TX)connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6);  // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0);  // (RX,TX) connect to TX,RX of PZEM3
