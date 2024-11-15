@@ -167,26 +167,26 @@ String GetPzemsValues() {
   return data;
 }
 
-String SendHTML() {
-  String ptr = "<!DOCTYPE html> <html lang=\"ru\">\n";
-  ptr +="<head><meta http-equiv=refresh content=30><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
-  ptr +="<title>Энергомонитор PZEM</title>\n";
-  ptr += "<small>via AP: ";
-  ptr += WiFi.SSID();
-  ptr += "</small><br>";
-  ptr +="<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-  ptr +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
-  ptr +="p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
-  ptr +="</style>\n";
-  ptr +="</head>\n";
-  ptr +="<body>\n";
-  ptr +="<h1>PZEM Энергомонитор ESP8266 Веб сервер</h1>\n";
-  ptr +="<p>";
-  ptr += GetPzemsValues();
-  ptr +="</p>";
-  ptr +="</body>\n";
-  ptr +="</html>\n";
-  return ptr;
+String GetHTML() {
+  String index = "<!DOCTYPE html> <html lang=\"ru\">\n";
+  index +="<head><meta http-equiv=refresh content=30><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
+  index +="<title>Энергомонитор PZEM</title>\n";
+  index += "<small>via AP: ";
+  index += WiFi.SSID();
+  index += "</small><br>";
+  index +="<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
+  index +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
+  index +="p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
+  index +="</style>\n";
+  index +="</head>\n";
+  index +="<body>\n";
+  index +="<h1>PZEM Энергомонитор ESP8266 Веб сервер</h1>\n";
+  index +="<p>";
+  index += GetPzemsValues();
+  index +="</p>";
+  index +="</body>\n";
+  index +="</html>\n";
+  return index;
 }
 
 void setup() {
@@ -345,9 +345,6 @@ void loop() {
   }
 
   if (!ledStateOld && ledState) {                 // ИНДикатор только что погас
-    //Serial.println(": OFF");
-    //digitalWrite(LED_PIN, LOW);                   // гасим светодиод индикации импульсов
-    //digitalWrite(BUZ_PIN, LOW);                   // выключаем пищалку на всякий случай (она дублирует мигание индикатора)
     closeAnalogWindow();                          // ужимаем пороги окна сенсора, чтобы они хронически не росли.
   }
 
@@ -358,7 +355,7 @@ void handle_NotFound() {
 }
 
 void handle_OnConnect() {
-  server.send(200, "text/html", SendHTML());
+  server.send(200, "text/html", GetHTML());
 }
 
 void initWindow() {
