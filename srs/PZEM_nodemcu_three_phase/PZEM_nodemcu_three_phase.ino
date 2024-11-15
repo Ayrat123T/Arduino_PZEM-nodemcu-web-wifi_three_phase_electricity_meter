@@ -136,17 +136,19 @@ String GetPzemsValues() {
   data += " Hz; cos(f)3 =  ";
   data += pf3;
 
+  float power = power1 + power2 +power3; 
+
   Serial.print(" I = ");
   Serial.print(current1 + current2 +current3);
   Serial.print(" A; W = ");
-  Serial.print(power1 + power2 +power3);
+  Serial.print(power);
   Serial.print(" kWt; P3 = ");
   Serial.print(energy1 + energy2 + energy3);
   Serial.println(" kWt*h;");
   data += "</li><li> I = ";
   data += current1 + current2 +current3;
   data += " A; W = ";
-  data += power1 + power2 +power3;
+  data += power;
   data += " kWt; P = ";
   data += energy1 + energy2 + energy3;
   data += " kWt*h; </li>";
@@ -157,6 +159,10 @@ String GetPzemsValues() {
   data += "<li> Длина последнего импульса t = ";
   data += double(microSpent) /1000000;
   data += " s; </li>";
+
+  data += "<li> Погрешность = ";
+  data += (power - wattage) / power * 100;
+  data += " %; </li>";
   
   return data;
 }
@@ -322,7 +328,7 @@ void loop() {
     microTimer = micros();                        //    запоминаем время этого перехода в таймер
     //                                                 вычисление длины последнего импульса
     blincsPerHour = 3600000000000 / microSpent;   //    сколько таких импульсов такой длины поместилось бы в часе
-    wattage = (blincsPerHour / 6400);             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
+    wattage = (blincsPerHour / 10000) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
       Serial.print(" Текущая нагрузка W = ");
   Serial.print(wattage);
   Serial.println(" kWt;");
