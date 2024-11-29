@@ -1,0 +1,120 @@
+html {
+    height: 100%;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    font-family: 'bahnschrift';
+    text-align: center;
+    font-size: 20pt;
+}
+
+body {
+    background-color: #323131;
+    color: white;
+}
+
+.header {
+    align-items: baseline;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 22pt;
+    float: center;
+    text-align: center;
+    display: flow-root;
+}
+
+.footer {
+    font-size: 12pt;
+    color: #ffffff;
+    text-align: center;
+    display: inline-block;
+}
+
+.footer:hover {
+    opacity: 0.7;
+  }
+
+.output {
+    font-size: 18pt;
+    text-align: left;
+}
+
+.input {
+    text-align: right;
+    max-width: 150px;
+    width: 30vw;
+    font-size: 22pt;
+    display: inline;
+    font-family: 'bahnschrift';
+}
+
+input:hover {
+    opacity: 0.7;
+  }
+
+.labelMeterCheck {
+    text-align: center;
+    font-size: 20pt;
+    height: 100%;
+    display: inline-table;
+    font-family: 'bahnschrift';
+}
+
+.inputMeterCheck {
+    text-align: right;
+    max-width: 150px;
+    width: 15vw;
+    font-size: 22pt;
+    display: inline-table;
+    font-family: 'bahnschrift';
+    cursor: default;
+    opacity: 0.8;
+}
+
+.inputErr {
+    text-align: center;
+    font-size: 22pt;
+    height: 100%;
+    width: 200px;
+    display: inline-block;
+    font-family: 'bahnschrift';
+    margin: 5px;
+}
+
+.inputRadio {
+    font-size: 20pt;
+}
+
+.button {
+    border-radius: 10px;
+    height: 100%;
+    margin: 1%;
+    box-sizing: border-box;
+    border: 3px;
+    text-align: center;
+    font-size: 22pt;
+    cursor: pointer;
+    color: white;
+    background-color: rgb(0,145,215);
+    font-family: 'bahnschrift';
+}
+
+.button:hover {
+    opacity: 0.6;
+  }
+
+#StartMeterCheck {
+    background-color: #77dd77;
+    font-size: 30pt;
+    padding:2%;
+}
+
+#resetMeterCheck {
+    font-size: 30pt;
+    padding:2%
+}
+
+input[type="checkbox"] {
+    font-size: 22;
+    width: 20px;
+    height: 20px;
+}

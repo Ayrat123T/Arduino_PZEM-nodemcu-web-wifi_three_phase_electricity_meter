@@ -7,6 +7,8 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
+#include "index.h"
+
 #define STASSID "Redmi_DF75"
 #define STAPSK "51194303"
 #define ANALOG_PIN A0
@@ -22,171 +24,82 @@ ESP8266WebServer server(80);
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
+
 PZEM004Tv30 pzem1(D1, D2); // (RX,TX)connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6);  // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0);  // (RX,TX) connect to TX,RX of PZEM3
 #define ONE_WIRE_BUS D3 // ds18b20
 
+
 int winHi = 0, winLo = 1024;              // store histeresis limits here
-int dataCur;                              // temporary storage of current data
+int dataCur;                              // temporary storage of current index_pzem_data
 unsigned long microTimer, microSpent;     // stopWatch timer in microSec
 boolean ledState, ledStateOld;            // current logic state
 float wattage = 0;                        // store current wattage
+int = impSMDсonst = 10000;                        // постояннная счётчика
 float blincsPerHour;                      // store how much blinks can fill 1 hour
 int windowLo = 0;                         // bottom line of scale window in Wt
 int windowHi = 1000;                      // top line of scale window in Wt
 float iCalc;                                // here i'll store calculated impedance (I=P/V)
-int vData = 220;                          // gere i'll place voltage data or set it manually;
+int vData = 220;                          // gere i'll place voltage index_pzem_data or set it manually;
 
-String GetPzemsValues() {
-  //main energy meter
-  float voltage1 = pzem1.voltage();
+void GetPzemsValues() {
   float current1 = pzem1.current();
   float power1 = pzem1.power() / 1000;
   float energy1 = pzem1.energy() / 1000;
-  float frequency1 = pzem1.frequency();
-  float pf1 = pzem1.pf();
-  Serial.print("PZEM1: V1 = ");
-  Serial.print(voltage1);
-  Serial.print(" B; I1 = ");
-  Serial.print(current1);
-  Serial.print(" A; W1 = ");
-  Serial.print(power1);
-  Serial.print(" kWt; P1 = ");
-  Serial.print(energy1);
-  Serial.print(" kWt*h; F1 = ");
-  Serial.print(frequency1);
-  Serial.print(" Hz; cos(f)1 =  ");
-  Serial.println(pf1);
 
-  String data = "<li>V1 = ";
-  data += voltage1;
-  data += " B; I1 = ";
-  data += current1;
-  data += " A; W1 = ";
-  data += power1;
-  data += " kWt; P1 = ";
-  data += energy1;
-  data += " kWt*h; F1 = ";
-  data += frequency1;
-  data += " Hz; cos(f)1 =  ";
-  data += pf1;
-
-  //energymeter 2
-  float voltage2 = pzem2.voltage();
   float current2 = pzem2.current();
   float power2 = pzem2.power() / 1000;
   float energy2 = pzem2.energy() / 1000;
-  float frequency2 = pzem2.frequency();
-  float pf2 = pzem2.pf();
-  Serial.print("PZEM2: V2 = ");
-  Serial.print(voltage2);
-  Serial.print(" B; I2 = ");
-  Serial.print(current2);
-  Serial.print(" A; W2 = ");
-  Serial.print(power2);
-  Serial.print(" kWt; P2 = ");
-  Serial.print(energy2);
-  Serial.print(" kWt*h; F2 = ");
-  Serial.print(frequency2);
-  Serial.print(" Hz; cos(f)2 = ");
-  Serial.println(pf2);
-  data += "</li><li>V2 = ";
-  data += voltage2;
-  data += " B; I2 = ";
-  data += current2;
-  data += " A; W2 = ";
-  data += power2;
-  data += " kWt; P2 = ";
-  data += energy2;
-  data += " kWt*h; F2 = ";
-  data += frequency2;
-  data += " Hz; cos(f)2 =  ";
-  data += pf2;
 
-  // energy meter 3
-  float voltage3 = pzem3.voltage();
   float current3 = pzem3.current();
-  float power3 = pzem3.power() /1000;
-  float energy3 = pzem3.energy() /1000;
-  float frequency3 = pzem3.frequency();
-  float pf3 = pzem3.pf();
-  Serial.print("PZEM3: V3 = ");
-  Serial.print(voltage3);
-  Serial.print(" B; I3 = ");
-  Serial.print(current3);
-  Serial.print(" A; W3 = ");
-  Serial.print(power3);
-  Serial.print(" kWt; P3 = ");
-  Serial.print(energy3);
-  Serial.print(" kWt*h; F3 = ");
-  Serial.print(frequency3);
-  Serial.print(" Hz; cos(f)3 =  ");
-  Serial.println(pf3);
-  data += "</li><li>V3 = ";
-  data += voltage3;
-  data += " B; I3 = ";
-  data += current3;
-  data += " A; W3 = ";
-  data += power3;
-  data += " kWt; P3 = ";
-  data += energy3;
-  data += " kWt*h; F3 = ";
-  data += frequency3;
-  data += " Hz; cos(f)3 =  ";
-  data += pf3;
+  float power3 = pzem3.power() / 1000;
+  float energy3 = pzem3.energy() / 1000;
 
-  float power = power1 + power2 +power3; 
-
-  Serial.print(" I = ");
-  Serial.print(current1 + current2 +current3);
-  Serial.print(" A; W = ");
-  Serial.print(power);
-  Serial.print(" kWt; P3 = ");
-  Serial.print(energy1 + energy2 + energy3);
-  Serial.println(" kWt*h;");
-  data += "</li><li> I = ";
-  data += current1 + current2 +current3;
-  data += " A; W = ";
-  data += power;
-  data += " kWt; P = ";
-  data += energy1 + energy2 + energy3;
-  data += " kWt*h; </li>";
-
-  data += "<li> Текущая нагрузка W = ";
-  data += wattage;
-  data += " kWt; </li>";
-  data += "<li> Длина последнего импульса t = ";
-  data += double(microSpent) /1000000;
-  data += " s; </li>";
-
-  data += "<li> Погрешность = ";
-  data += (power - wattage) / power * 100;
-  data += " %; </li>";
+  float current = current1 + current2 + current3; 
+  float power = power1 + power2 + power3; 
+  float energy = energy1 + energy2 + energy3; 
+ 
+  String json_pzem_data =
+    "{ \"voltages\":[";
+      + pzem1.voltage() + ','
+      + pzem2.voltage() + ','
+      + pzem3.voltage() + "],"
+    + "\"currents\":["
+      + current1 + ','
+      + current2 + ','
+      + current3 + "],"
+    + "\"powers\":["
+      + power1 + ','
+      + power2 + ','
+      + power3 + "],"
+    + "\"energies\":["
+      + energy1 + ','
+      + energy2 + ','
+      + energy3 + "],"
+    + "\"frequencies\":["
+      + pzem1.frequency(); + ','
+      + pzem2.frequency(); + ','
+      + pzem3.frequency(); + "],"
+    + "\"powerFactories\":["
+      + pzem1.pf(); + ','
+      + pzem2.pf(); + ','
+      + pzem3.pf(); + "],"
+    + "\"FullValues\":{"
+    + "current:" + current + ','
+    + "power:" + power + ','
+    + "energy:" + energy + "},"
+    + "\"ResSMDValues\":{"
+    + "SMDimpPeriod:" + double(microSpent) /1000000 + ','
+    + "SMDpower:" + wattage + ','
+    + "SMDAccuraty:" + (power - wattage) / power * 100 + "}}";
   
-  return data;
+  server.send(200, "text/plane", json_pzem_data);
 }
 
-String GetHTML() {
-  String index = "<!DOCTYPE html> <html lang=\"ru\">\n";
-  index +="<head><meta http-equiv=refresh content=30><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
-  index +="<title>Энергомонитор PZEM</title>\n";
-  index += "<small>via AP: ";
-  index += WiFi.SSID();
-  index += "</small><br>";
-  index +="<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-  index +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
-  index +="p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
-  index +="</style>\n";
-  index +="</head>\n";
-  index +="<body>\n";
-  index +="<h1>PZEM Энергомонитор ESP8266 Веб сервер</h1>\n";
-  index +="<p>";
-  index += GetPzemsValues();
-  index +="</p>";
-  index +="</body>\n";
-  index +="</html>\n";
-  return index;
+void handleRoot() {
+ String html_index_h = webpage;
+ server.send(200, "text/html", html_index_h);
 }
 
 void setup() {
@@ -273,12 +186,9 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());  //IP address assigned to your ESP
 
-
 // HTTP server setup
 	server.on("/", handle_OnConnect);
-	//server.on("/pzem1", handle_pzem1);
-  //server.on("/pzem2", handle_pzem2);
-  //server.on("/pzem3", handle_pzem3);
+  server.on("/pzem_values)", GetPzemsValues);
 	server.onNotFound(handle_NotFound);
 
 	server.begin();
@@ -328,20 +238,18 @@ void loop() {
     microTimer = micros();                        //    запоминаем время этого перехода в таймер
     //                                                 вычисление длины последнего импульса
     blincsPerHour = 3600000000000 / microSpent;   //    сколько таких импульсов такой длины поместилось бы в часе
-    wattage = (blincsPerHour / 10000) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
-      Serial.print(" Текущая нагрузка W = ");
-  Serial.print(wattage);
-  Serial.println(" kWt;");
-    //digitalWrite(LED_PIN, HIGH);                  // зажигаем индикатор считываемых импульсов
+    wattage = (blincsPerHour / impSMDсonst) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
+    Serial.print(" Текущая нагрузка W = ");
+    Serial.print(wattage);
+    Serial.println(" kWt;");
     iCalc = wattage / vData;
-    if (wattage > ALARM_WT) {                     //  если нагрузка больше сигнального порога
-      //digitalWrite(BUZ_PIN, HIGH);                //    включить пищалку
+    /*if (wattage > ALARM_WT) {                     //  если нагрузка больше сигнального порога
       windowLo = ALARM_WT;                        //    сменить шкалу нагрузки на тревожную
       windowHi = SCALE_TOP;
     } else {                                      //  если нагрузка ниже сигнального порога
       windowLo = 0;                               //    установить шкалу нагрузки от 0 до уровня тревоги
       windowHi = ALARM_WT;
-    }
+    }*/
   }
 
   if (!ledStateOld && ledState) {                 // ИНДикатор только что погас

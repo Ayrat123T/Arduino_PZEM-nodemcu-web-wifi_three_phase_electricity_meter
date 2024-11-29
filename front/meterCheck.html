@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>Автоматическая проверка ИПУЭ</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" />
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="main_body">
+        <form name="MeterCheck">
+            <p><table class="input"><tr><td>
+                <label for="CurrentTransformerTransformationRatio">Ктт = </label>
+                <input id="CurrentTransformerTransformationRatio" class="input" type="number" name="CurrentTransformerTransformationRatio" placeholder="1" value="1" required min="0" title="коэффициент трансформации трансформатора тока"/></td></tr></table>
+                <table class="input"><tr><td><label for="ImpsMeterCheck" >A[имп/кВ*ч] = </label>
+                    <input id="ImpsMeterCheck" class="input" type="number" name="ImpsMeterCheck" list = "impsList" required title="постоянная счётчика"/></td></tr></table>
+                    <datalist id="impsList">
+                        <option value="250"></option>
+                        <option value="500"></option>
+                        <option value="1000"></option>
+                        <option value="1600"></option>
+                        <option value="3200"></option>
+                        <option value="5000"></option>
+                        <option value="10000"></option>
+                </datalist>
+                <table class="input"><tr><td>
+                    <input id="SMDSerialNumMeterCheck" class="inputErr" name="SMDSerialNumMeterCheck" placeholder="Номер ИПУ"/>
+                </td></tr></table></p>
+
+            <p><table class="input"><tr>
+                    <td><label id="PzemVoltageMeterLabel" class="labelMeterCheck">U[В] = </label></td>
+                    <td><input id="PzemVoltageMeterCheck1" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck1" required readonly/></td>
+                    <td><input id="PzemVoltageMeterCheck2" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck2" required readonly/></td>
+                    <td><input id="PzemVoltageMeterCheck3" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck3" required readonly/></td>
+                </tr>
+                <tr>
+                    <td><label id="PzemCurrentMeterLabel" class="labelMeterCheck">I[А] = </label></td>
+                    <td><input id="PzemCurrentMeterCheck1" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck1" required readonly/></td>
+                    <td><input id="PzemCurrentMeterCheck2" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck2" required readonly/></td>
+                    <td><input id="PzemCurrentMeterCheck3" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck3" required readonly/></td>
+                </tr>
+                <tr>
+                    <td><label id="PzemPowerMeterLabel" class="labelMeterCheck">P[кВт] = </label></td>
+                    <td><input id="PzemPowerMeterCheck1" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck1" required readonly/></td>
+                    <td><input id="PzemPowerMeterCheck2" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck2" required readonly/></td>
+                    <td><input id="PzemPowerMeterCheck3" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck3" required readonly/></td>
+                </tr>
+                <tr>
+                    <td><label id="PzemEnergyMeterLabel" class="labelMeterCheck">W[кВт*ч] = </label></td>
+                    <td><input id="PzemEnergyMeterCheck1" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck1" required readonly/></td>
+                    <td><input id="PzemEnergyMeterCheck2" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck2" required readonly/></td>
+                    <td><input id="PzemEnergyMeterCheck3" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck3" required readonly/></td>
+                </tr>
+                <tr>
+                    <td><label id="PzemFrequencyMeterLabel" class="labelMeterCheck">f[Гц] = </label></td>
+                    <td><input id="PzemFrequencyMeterCheck1" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck1" required readonly/></td>
+                    <td><input id="PzemFrequencyMeterCheck2" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck2" required readonly/></td>
+                    <td><input id="PzemFrequencyMeterCheck3" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck3" required readonly/></td>
+                </tr>
+                <tr>
+                    <td><label id="PzemPowerFactorMeterLabel" class="labelMeterCheck">cos(ф) = </label></td>
+                    <td><input id="PzemPowerFactorMeterCheck1" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck1" required readonly/></td>
+                    <td><input id="PzemPowerFactorMeterCheck2" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck2" required readonly/></td>
+                    <td><input id="PzemPowerFactorMeterCheck3" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck3" required readonly/></td>
+                </tr>
+            </table></p>
+            <p class="input">
+                <table class="input"><tr><td><label for ="PzemFullCurrentCheck"  id="PzemFullCurrentMeterLabel" class="labelMeterCheck">Iсум[А] = </label>
+                    <input id="PzemFullCurrentCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
+                <table class="input"><tr><td><label for ="PzemFullPowerCheck" id="PzemFullPowerMeterLabel" class="labelMeterCheck">Pсум[кВт] = </label>
+                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
+                <table class="input"><tr><td><label for ="PzemFullEnergyMeterCheck" id="PzemFullEnergyMeterLabel" class="labelMeterCheck">Wсум[кВт*ч] = </label>
+                    <input id="PzemFullEnergyMeterCheck" type="number" class="inputMeterCheck" name="PzemFullEnergyMeterCheck" required readonly/></td></tr></table>
+             </p>
+            <p><table class="input"><tr><td><label id="KYImpsMeterLabel" class="labelMeterCheck">n[имп] = </label>
+                    <input id="KYImpsMeterCheck" type="number" class="inputMeterCheck" name="KYImpsMeterCheck"  title="кол-во импульсов" required readonly/></td></tr></table>
+                <table class="input"><tr><td><label id="ImpsPeriodMeterLabel" class="labelMeterCheck">Tимп[с] = </label>
+                    <input id="ImpsPeriodMeterCheck" type="number" class="inputMeterCheck" name="ImpsPeriodMeterCheck" title="период между импульсами" required readonly/></td></tr></table>
+            </p>
+                <p class="input">
+                    <table class="input"><tr><td><span id="timer" class="input">00:00:00.0;</span></td></tr></table>
+                    <table class="input"><tr><td><span id="CalcPower" class="input">P(ИПЭУ) = 0.0 Вт; </span></td></tr></table>
+                    <table class="input"><tr><td><span id="CalcEnergy" class="input">W(ИПЭУ) = 0.0 кВт*ч;</span></td></tr></table>
+                    <table class="input"><tr><td><span id="CalcMeterAccuracy" class="input">Погрешность = 0.0 %</span></td></tr></table>
+                <p><button id="StartMeterCheck" type="submit" class="button" name="StartMeterCheck">Старт▶</button>
+                    <button type="reset" onclick="clearALL()" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
+        </form>
+        <button id = "copyResultButton"
+        name = "copyResultButton"
+        class = "button"
+        style="display: none">📋 Скопировать результат</button>
+        <br>
+        <div class="output" id="printBlock"></div>
+        <div class="footer" id="CopyRights"><p><a href="https://gridcom-rt.ru/" class="footer">© 2024 GridCom</a></p>
+            <a href="mailto:airattu@mail.ru" class="footer">📧 airattu@mail.ru</a></div>
+    </body>
+    <script src="meterCheckScript.js"></script>
+</html>
