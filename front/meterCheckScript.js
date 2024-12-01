@@ -1,6 +1,6 @@
 let сurrentTransformerTransformationRatio = document.getElementById('CurrentTransformerTransformationRatio');
 
-let impsMeterCheck = document.getElementById('ImpsMeterCheck');
+let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
 
 let pzemVoltageMeterCheck1 = document.getElementById('PzemVoltageMeterCheck1');
 let pzemVoltageMeterCheck2 = document.getElementById('PzemVoltageMeterCheck2');
@@ -40,6 +40,17 @@ function CheckAllInputs() {
         return true;
     }
     return false;
+}
+
+function sendConstMeterImpsNumCheck() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        constMeterImpsNumCheck.value = this.responseText;
+    }
+  };
+  xhttp.open("GET", "led_set?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
+  xhttp.send();
 }
 
 function getPZEMsData() {

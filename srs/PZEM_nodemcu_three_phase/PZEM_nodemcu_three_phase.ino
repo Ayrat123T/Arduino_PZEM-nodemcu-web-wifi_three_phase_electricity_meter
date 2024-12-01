@@ -36,12 +36,17 @@ int dataCur;                              // temporary storage of current index_
 unsigned long microTimer, microSpent;     // stopWatch timer in microSec
 boolean ledState, ledStateOld;            // current logic state
 float wattage = 0;                        // store current wattage
-int = impSMDсonst = 10000;                        // постояннная счётчика
+int constMeterImpsNum = 10000;                        // постояннная счётчика
 float blincsPerHour;                      // store how much blinks can fill 1 hour
 int windowLo = 0;                         // bottom line of scale window in Wt
 int windowHi = 1000;                      // top line of scale window in Wt
 float iCalc;                                // here i'll store calculated impedance (I=P/V)
 int vData = 220;                          // gere i'll place voltage index_pzem_data or set it manually;
+
+void SetImpSMDсonst() {
+ constMeterImpsNum = server.arg("constMeterImpsNumVal");
+ server.send(200, "text/plane", constMeterImpsNum);
+}
 
 void GetPzemsValues() {
   float current1 = pzem1.current();
@@ -188,6 +193,7 @@ void setup() {
 
 // HTTP server setup
 	server.on("/", handle_OnConnect);
+  server.on("/const_meter_imps_num", SetConstMeterImpsNum);
   server.on("/pzem_values)", GetPzemsValues);
 	server.onNotFound(handle_NotFound);
 
@@ -238,7 +244,7 @@ void loop() {
     microTimer = micros();                        //    запоминаем время этого перехода в таймер
     //                                                 вычисление длины последнего импульса
     blincsPerHour = 3600000000000 / microSpent;   //    сколько таких импульсов такой длины поместилось бы в часе
-    wattage = (blincsPerHour / impSMDсonst) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
+    wattage = (blincsPerHour / constMeterImpsNum) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
     Serial.print(" Текущая нагрузка W = ");
     Serial.print(wattage);
     Serial.println(" kWt;");

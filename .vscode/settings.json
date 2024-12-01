@@ -45,6 +45,25 @@
         "xmemory": "cpp",
         "xstddef": "cpp",
         "xstring": "cpp",
-        "xtr1common": "cpp"
+        "xtr1common": "cpp",
+        "filesystem": "cpp",
+        "algorithm": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp",
+        "iomanip": "cpp",
+        "list": "cpp",
+        "locale": "cpp",
+        "mutex": "cpp",
+        "optional": "cpp",
+        "ratio": "cpp",
+        "sstream": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp",
+        "xlocbuf": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xloctime": "cpp"
     }
 }

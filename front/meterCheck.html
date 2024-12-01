@@ -13,8 +13,8 @@
             <p><table class="input"><tr><td>
                 <label for="CurrentTransformerTransformationRatio">Ктт = </label>
                 <input id="CurrentTransformerTransformationRatio" class="input" type="number" name="CurrentTransformerTransformationRatio" placeholder="1" value="1" required min="0" title="коэффициент трансформации трансформатора тока"/></td></tr></table>
-                <table class="input"><tr><td><label for="ImpsMeterCheck" >A[имп/кВ*ч] = </label>
-                    <input id="ImpsMeterCheck" class="input" type="number" name="ImpsMeterCheck" list = "impsList" required title="постоянная счётчика"/></td></tr></table>
+                <table class="input"><tr><td><label for="ConstMeterImpsNumCheck" >A[имп/кВ*ч] = </label>
+                    <input id="ConstMeterImpsNumCheck" class="input" type="number" name="ConstMeterImpsNumCheck" list = "impsList" required title="постоянная счётчика" min = "0"/></td></tr></table>
                     <datalist id="impsList">
                         <option value="250"></option>
                         <option value="500"></option>
@@ -23,7 +23,7 @@
                         <option value="3200"></option>
                         <option value="5000"></option>
                         <option value="10000"></option>
-                </datalist>
+                    </datalist>
                 <table class="input"><tr><td>
                     <input id="SMDSerialNumMeterCheck" class="inputErr" name="SMDSerialNumMeterCheck" placeholder="Номер ИПУ"/>
                 </td></tr></table></p>

@@ -1,6 +1,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
+#include <windows.h>
+#include <stdlib.h>
 
 std::string WebToStr(std::ifstream& index_html_in) {
     std::string result;
@@ -10,14 +13,14 @@ std::string WebToStr(std::ifstream& index_html_in) {
             if (line.find("<link rel=\"stylesheet\"") != -1) {
                 line.clear();
                 line = "<style type=\"text/css\">";
-                std::ifstream index_html_in("front/style.css");
+                std::ifstream index_html_in("style.css");
                 line += WebToStr(index_html_in);
                 line += "</style>";
             }
             if (line.find("<script src=") != -1) {
                 line.clear();
                 line = "<script>";
-                std::ifstream index_html_in("front/meterCheckScript.js");
+                std::ifstream index_html_in("meterCheckScript.js");
                 line += WebToStr(index_html_in);
                 line += "</script>";
             }
@@ -27,12 +30,15 @@ std::string WebToStr(std::ifstream& index_html_in) {
     return result;
 }
 
-int main() {
-    std::ifstream index_html_in("front/meterCheck.html"); // окрываем файл для чтения
+int main(int argc, char*argv[]) {
+    std::ifstream index_html_in("meterCheck.html"); // окрываем файл для чтения
     std::string html = "const char webpage[] PROGMEM = R\"=====(";
     html += WebToStr(index_html_in);
     html += ")=====\";";
-    std::ofstream index_h_out("srs/PZEM_nodemcu_three_phase/index.h"); // окрываем файл для записи
+    TCHAR buffer[MAX_PATH];
+    GetCurrentDirectory(sizeof(buffer),buffer); //Получить текущую деректорию
+    const std::filesystem::path comtrade_files_path = std::filesystem::path(buffer).parent_path();
+    std::ofstream index_h_out(comtrade_files_path / "srs/PZEM_nodemcu_three_phase/index.h"); // окрываем файл для записи
        if (index_h_out.is_open())
     {
         index_h_out << html;
