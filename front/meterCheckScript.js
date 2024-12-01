@@ -84,6 +84,8 @@ function startMeterCheck(e) {
             if (сurrentTransformerTransformationRatio.value <= 0) {
                 alert('Ктт не должен быть равен 0');
             } else {
+                SetImpSMDсonst();
+                getPZEMsData();
                 ResetPZEMs();
                 seconds = 0.0;
                 minutes = 0;
