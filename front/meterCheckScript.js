@@ -85,7 +85,6 @@ function startMeterCheck(e) {
                 alert('Ктт не должен быть равен 0');
             } else {
                 SetImpSMDсonst();
-                getPZEMsData();
                 ResetPZEMs();
                 seconds = 0.0;
                 minutes = 0;
