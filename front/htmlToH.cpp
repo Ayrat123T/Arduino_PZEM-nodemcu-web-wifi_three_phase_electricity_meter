@@ -10,6 +10,10 @@ std::string WebToStr(std::ifstream& index_html_in) {
     std::string line;
     if (index_html_in.is_open()) {
         while (std::getline(index_html_in, line)) {
+            char last_line_element = line[line.size() - 1];
+            if (last_line_element == ';' || last_line_element == '>' || last_line_element == '{' || last_line_element == '}') {
+                result +="\n";
+            }
             if (line.find("<link rel=\"stylesheet\"") != -1) {
                 line.clear();
                 line = "<style type=\"text/css\">";

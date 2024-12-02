@@ -5,18 +5,14 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
+// #include <WiFiClient.h>
 
 #include "index.h"
 
 #define STASSID "Redmi_DF75"
 #define STAPSK "51194303"
 #define ANALOG_PIN A0
-#define ALARM_WT 1000
-#define SCALE_TOP 2000
-#define HYST_BORDER 10                    // factor for set hysteresis
 #define CLOSE_WIN_FACTOR 10               // 1/X for narrowing window each side
-// #include <WiFiClient.h>
 
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);
@@ -24,28 +20,24 @@ ESP8266WebServer server(80);
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-
 PZEM004Tv30 pzem1(D1, D2); // (RX,TX)connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6);  // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0);  // (RX,TX) connect to TX,RX of PZEM3
-#define ONE_WIRE_BUS D3 // ds18b20
-
 
 int winHi = 0, winLo = 1024;              // store histeresis limits here
 int dataCur;                              // temporary storage of current index_pzem_data
 unsigned long microTimer, microSpent;     // stopWatch timer in microSec
 boolean ledState, ledStateOld;            // current logic state
-float wattage = 0;                        // store current wattage
+float meterWattage = 0;                        // store current meterWattage
 int constMeterImpsNum = 10000;                        // постояннная счётчика
 float blincsPerHour;                      // store how much blinks can fill 1 hour
 int windowLo = 0;                         // bottom line of scale window in Wt
 int windowHi = 1000;                      // top line of scale window in Wt
-float iCalc;                                // here i'll store calculated impedance (I=P/V)
-int vData = 220;                          // gere i'll place voltage index_pzem_data or set it manually;
 
-void SetImpSMDсonst() {
- constMeterImpsNum = server.arg("constMeterImpsNumVal");
- server.send(200, "text/plane", constMeterImpsNum);
+void SetConstMeterImpsNum() {
+  String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
+ constMeterImpsNum = constMeterImpsNumStr.toInt();
+ server.send(200, "text/plane", String(pzem1.voltage()));
 }
 
 void GetPzemsValues() {
@@ -67,39 +59,78 @@ void GetPzemsValues() {
  
   String json_pzem_data =
     "{ \"voltages\":[";
-      + pzem1.voltage() + ','
-      + pzem2.voltage() + ','
-      + pzem3.voltage() + "],"
-    + "\"currents\":["
-      + current1 + ','
-      + current2 + ','
-      + current3 + "],"
-    + "\"powers\":["
-      + power1 + ','
-      + power2 + ','
-      + power3 + "],"
-    + "\"energies\":["
-      + energy1 + ','
-      + energy2 + ','
-      + energy3 + "],"
-    + "\"frequencies\":["
-      + pzem1.frequency(); + ','
-      + pzem2.frequency(); + ','
-      + pzem3.frequency(); + "],"
-    + "\"powerFactories\":["
-      + pzem1.pf(); + ','
-      + pzem2.pf(); + ','
-      + pzem3.pf(); + "],"
-    + "\"FullValues\":{"
-    + "current:" + current + ','
-    + "power:" + power + ','
-    + "energy:" + energy + "},"
-    + "\"ResSMDValues\":{"
-    + "SMDimpPeriod:" + double(microSpent) /1000000 + ','
-    + "SMDpower:" + wattage + ','
-    + "SMDAccuraty:" + (power - wattage) / power * 100 + "}}";
+      json_pzem_data += pzem1.voltage();
+      json_pzem_data += ',';
+      json_pzem_data += pzem2.voltage();
+      json_pzem_data += ',';
+      json_pzem_data += pzem3.voltage();
+      json_pzem_data += "],";
+    json_pzem_data += "\"currents\":[";
+      json_pzem_data += current1;
+      json_pzem_data += ',';
+      json_pzem_data += current2;
+      json_pzem_data += ',';
+      json_pzem_data += current3;
+      json_pzem_data += "],";
+    json_pzem_data += "\"powers\":[";
+      json_pzem_data += power1;
+      json_pzem_data += ',';
+      json_pzem_data += power2;
+      json_pzem_data += ',';
+      json_pzem_data += power3;
+      json_pzem_data += "],";
+    json_pzem_data += "\"energies\":[";
+      json_pzem_data += energy1;
+      json_pzem_data += ',';
+      json_pzem_data += energy2;
+      json_pzem_data += ',';
+      json_pzem_data += energy3;
+      json_pzem_data += "],";
+    json_pzem_data += "\"frequencies\":[";
+      json_pzem_data += pzem1.frequency();
+      json_pzem_data += ',';
+      json_pzem_data += pzem2.frequency();
+      json_pzem_data += ',';
+      json_pzem_data += pzem3.frequency();
+      json_pzem_data += "],";
+    json_pzem_data += "\"powerFactories\":[";
+      json_pzem_data += pzem1.pf();
+      json_pzem_data += ',';
+      json_pzem_data += pzem2.pf();
+      json_pzem_data += ',';
+      json_pzem_data += pzem3.pf();
+      json_pzem_data += "],";
+    json_pzem_data += "\"FullValues\":{";
+      json_pzem_data += "current:";
+      json_pzem_data += current;
+      json_pzem_data += ',';
+      json_pzem_data += "power:";
+      json_pzem_data += power + ',';
+      json_pzem_data += "energy:";
+      json_pzem_data += energy;
+      json_pzem_data += "},";
+    json_pzem_data += "\"ResSMDValues\":{";
+      json_pzem_data += "SMDimpPeriod:";
+      json_pzem_data += double(microSpent) /1000000;
+      json_pzem_data += ',';
+      json_pzem_data += "SMDpower:";
+      json_pzem_data += meterWattage;
+      json_pzem_data += ',';
+      json_pzem_data += "SMDAccuraty:";
+      json_pzem_data += (power - meterWattage) / power * 100;
+      json_pzem_data += "}}";
   
   server.send(200, "text/plane", json_pzem_data);
+}
+
+void resetPzemsEnergies() {
+  if (pzem1.resetEnergy() &&
+      pzem2.resetEnergy() &&
+      pzem3.resetEnergy()) {
+        server.send(200, "text/plane", "Energy in pzems has been reset");
+  } else {
+    server.send(200, "text/plane", "power reset error!");
+  }
 }
 
 void handleRoot() {
@@ -134,56 +165,6 @@ void setup() {
     delay(250);
   }
 
-// OTA section
-  // Port defaults to 8266
-  // ArduinoOTA.setPort(8266);
-
-  // Hostname defaults to esp8266-[ChipID]
-  // ArduinoOTA.setHostname("pzem_meter");
-  char tmp[15];
-  sprintf(tmp, "pzem_meter-%06x", ESP.getChipId());
-  ArduinoOTA.setHostname(tmp);
-
-  // No authentication by default
-  ArduinoOTA.setPassword("ADMIN_PASSWORD");
-
-  // Password can be set with it's md5 value as well
-  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
-  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
-
-  ArduinoOTA.onStart([]() {
-    String type;
-    if (ArduinoOTA.getCommand() == U_FLASH) {
-      type = "sketch";
-    } else { // U_FS
-      type = "filesystem";
-    }
-
-    // NOTE: if updating FS this would be the place to unmount FS using FS.end()
-    Serial.println("Start updating " + type);
-  });
-  ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) {
-      Serial.println("Auth Failed");
-    } else if (error == OTA_BEGIN_ERROR) {
-      Serial.println("Begin Failed");
-    } else if (error == OTA_CONNECT_ERROR) {
-      Serial.println("Connect Failed");
-    } else if (error == OTA_RECEIVE_ERROR) {
-      Serial.println("Receive Failed");
-    } else if (error == OTA_END_ERROR) {
-      Serial.println("End Failed");
-    }
-  });
-  ArduinoOTA.begin();
-
   //If connection successful show IP address in serial monitor
   Serial.println("");
   Serial.print("Connected to Network/SSID: ");
@@ -192,11 +173,11 @@ void setup() {
   Serial.println(WiFi.localIP());  //IP address assigned to your ESP
 
 // HTTP server setup
-	server.on("/", handle_OnConnect);
+	server.on("/", handleRoot);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
   server.on("/pzem_values)", GetPzemsValues);
+  server.on("/pzem_reset_energies)", resetPzemsEnergies);
 	server.onNotFound(handle_NotFound);
-
 	server.begin();
 	Serial.println("HTTP server started");
 
@@ -207,69 +188,33 @@ void loop() {
   while (wifiMulti.run() != WL_CONNECTED) {
     digitalWrite(D4, LOW);
     delay(250);
-    Serial.print(".");
     digitalWrite(D4, HIGH);
     delay(250);
   }
   delay(100);
   server.handleClient();
-  ArduinoOTA.handle();
 
   dataCur = analogRead(ANALOG_PIN);               // запоминаем значение на сенсоре
   findAnalogWindow(dataCur);                      // расширяем окно, если значение выходит за его пределы
   ledStateOld = ledState;                         // сохраняем в буфер старое значение уровня сенсора
   checkLogic(dataCur);                            // оцениваем состояние сенсора и сохраняем его значение в ledState
-  if (ledState == !ledStateOld) {                 // ИНДикатор только что изменил своё состояние
-    //Serial.print("LED changed");
-    if (windowLo < 1000) {
-      Serial.print(windowLo);
-    } 
-    else {
-      Serial.print(String((int)windowLo / 1000) + " k ");
-    } 
-    Serial.print((int) wattage); Serial.print(" w ");
-    Serial.print(String(iCalc)); Serial.print(" a ");
-    if (windowHi < 1000) {
-      Serial.print(windowHi);
-    }
-    else {
-      Serial.print( String((int)windowHi / 1000) + " k ");
-    }
-  }
 
   if (ledStateOld && !ledState) {                 // ИНДикатор только что загорелся
-    //Serial.println(": ON");
     //                                                 вычисление длины последнего импульса
     microSpent = micros() - microTimer;           //    длина последнего импульса = текущее время - время прошлого перехода
     microTimer = micros();                        //    запоминаем время этого перехода в таймер
     //                                                 вычисление длины последнего импульса
     blincsPerHour = 3600000000000 / microSpent;   //    сколько таких импульсов такой длины поместилось бы в часе
-    wattage = (blincsPerHour / constMeterImpsNum) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
-    Serial.print(" Текущая нагрузка W = ");
-    Serial.print(wattage);
-    Serial.println(" kWt;");
-    iCalc = wattage / vData;
-    /*if (wattage > ALARM_WT) {                     //  если нагрузка больше сигнального порога
-      windowLo = ALARM_WT;                        //    сменить шкалу нагрузки на тревожную
-      windowHi = SCALE_TOP;
-    } else {                                      //  если нагрузка ниже сигнального порога
-      windowLo = 0;                               //    установить шкалу нагрузки от 0 до уровня тревоги
-      windowHi = ALARM_WT;
-    }*/
+    meterWattage = (blincsPerHour / constMeterImpsNum) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
   }
 
   if (!ledStateOld && ledState) {                 // ИНДикатор только что погас
     closeAnalogWindow();                          // ужимаем пороги окна сенсора, чтобы они хронически не росли.
   }
-
 }
 
 void handle_NotFound() {
     server.send(404, "text/plain", "Not found");
-}
-
-void handle_OnConnect() {
-  server.send(200, "text/html", GetHTML());
 }
 
 void initWindow() {
@@ -277,9 +222,6 @@ void initWindow() {
   while (millis() < startTimer) {
     dataCur = analogRead(ANALOG_PIN);
     findAnalogWindow(dataCur);
-    Serial.print("winLo value:"); Serial.print(winLo);
-    Serial.print(", dataCur value:"); Serial.print(dataCur);
-    Serial.print(", winHi value:"); Serial.print(winHi);
   }
 }
 
@@ -298,7 +240,7 @@ void checkLogic(int analogData) {
 
 void closeAnalogWindow() {
   if (winLo < winHi - 30) {
-    int winDif = (winHi - winLo) ;                    // вычисляем ширину окна
+    int winDif = (winHi - winLo);                    // вычисляем ширину окна
     winHi = winHi - (winDif / CLOSE_WIN_FACTOR);      // вычитаем 1/10 ширины из верхнего порога
     winLo = winLo + (winDif / CLOSE_WIN_FACTOR);      // прибавляем 1/10 ширины к нижнему порогу
   }
