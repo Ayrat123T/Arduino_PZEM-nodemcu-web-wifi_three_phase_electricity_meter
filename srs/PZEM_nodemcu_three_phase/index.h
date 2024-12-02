@@ -241,6 +241,7 @@ function sendConstMeterImpsNumCheck() {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         console.log(this.responseText);
+        pzemVoltageMeterCheck1.value = this.responseText;
     }
   };
   xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
@@ -261,6 +262,14 @@ setInterval(function() {
   getPZEMsData();
 }, 1000);
 function ResetPZEMs() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+        }
+    };
+    xhttp.open("GET", "pzem_reset_energies", true);
+    xhttp.send();
 };
 function startMeterCheck(e) {
     if (CheckAllInputs()) {
@@ -269,7 +278,7 @@ function startMeterCheck(e) {
             if (сurrentTransformerTransformationRatio.value <= 0) {
                 alert('Ктт не должен быть равен 0');
             } else {
-                //sendConstMeterImpsNumCheck();
+                sendConstMeterImpsNumCheck();
                 getPZEMsData();
                 ResetPZEMs();
                 seconds = 0.0;
