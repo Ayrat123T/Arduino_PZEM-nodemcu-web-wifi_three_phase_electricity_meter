@@ -1,10 +1,7 @@
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <stdlib.h>
+#include "htmlToH.h"
 
 std::string WebToStr(std::ifstream& index_html_in) {
+    const std::filesystem::path CurrentPath = std::filesystem::current_path().parent_path().parent_path();
     std::string result;
     std::string line;
     if (index_html_in.is_open()) {
@@ -16,14 +13,14 @@ std::string WebToStr(std::ifstream& index_html_in) {
             if (line.find("<link rel=\"stylesheet\"") != -1) {
                 line.clear();
                 line = "<style type=\"text/css\">";
-                std::ifstream index_html_in("style.css");
+                std::ifstream index_html_in(CurrentPath / "front/style.css");
                 line += WebToStr(index_html_in);
                 line += "\n</style>";
             }
             if (line.find("<script src=") != -1) {
                 line.clear();
                 line = "<script>";
-                std::ifstream index_html_in("meterCheckScript.js");
+                std::ifstream index_html_in(CurrentPath / "front/meterCheckScript.js");
                 line += WebToStr(index_html_in);
                 line += "\n</script>";
             }
@@ -33,21 +30,15 @@ std::string WebToStr(std::ifstream& index_html_in) {
     return result;
 }
 
-std::string MakeStrFromWeb() {
-    std::ifstream index_html_in("meterCheck.html"); // окрываем файл для чтения
+void MakeStrFromWeb() {
     std::string html = "const char webpage[] PROGMEM = R\"=====(";
+    const std::filesystem::path CurrentPath = std::filesystem::current_path().parent_path().parent_path();
+    std::ifstream index_html_in(CurrentPath / "front/meterCheck.html"); // окрываем файл для чтения
+    std::ofstream index_h_out("index.h"); // окрываем файл для записи
     html += WebToStr(index_html_in);
     html += ")=====\";";
-    const std::filesystem::path CurrentPath = std::filesystem::current_path().parent_path();
-    std::ofstream index_h_out(CurrentPath/ "srs/PZEM_nodemcu_three_phase/index.h"); // окрываем файл для записи
     if (index_h_out.is_open()) {
         index_h_out << html;
     }
     index_h_out.close();
-    return html;
-}
-
-int main() {
-    std::string html = MakeStrFromWeb();
-    return 0;
 }

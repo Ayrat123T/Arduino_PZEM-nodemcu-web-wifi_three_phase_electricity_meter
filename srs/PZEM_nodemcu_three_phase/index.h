@@ -110,7 +110,8 @@ input[type="checkbox"] {
     font-size: 22;
     width: 20px;
     height: 20px;
-}</style>
+}
+</style>
     </head>
     <body class="main_body">
         <form name="MeterCheck">
@@ -133,7 +134,7 @@ input[type="checkbox"] {
                 </td></tr></table></p>
             <p><table class="input"><tr>
                     <td><label id="PzemVoltageMeterLabel" class="labelMeterCheck">U[В] = </label></td>
-                    <td><input id="PzemVoltageMeterCheck1" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck1" required readonly/></td>
+                    <td><input id="PzemVoltageMeterCheck1" class="inputMeterCheck" name="PzemVoltageMeterCheck1" required readonly/></td>
                     <td><input id="PzemVoltageMeterCheck2" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck2" required readonly/></td>
                     <td><input id="PzemVoltageMeterCheck3" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck3" required readonly/></td>
                 </tr>
@@ -253,7 +254,8 @@ function getPZEMsData() {
         if (this.readyState == 4 && this.status == 200) {
             console.log(this.responseText);
             pzemVoltageMeterCheck1.value = this.responseText;
-        }
+        } /*else {
+            pzemVoltageMeterCheck1.value = "no data";        }*/
     };
     xhttp.open("GET", "pzem_values", true);
     xhttp.send();
@@ -350,6 +352,7 @@ n = ' + kyImpsMeterCheck.value.toString() + ' имп;    \n\r';
         console.log("Failed...");
     }
     document.body.removeChild(inp);
-};</script>
+};
+</script>
     </body>
 </html>)=====";

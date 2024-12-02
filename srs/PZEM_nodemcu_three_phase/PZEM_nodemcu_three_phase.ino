@@ -8,6 +8,7 @@
 // #include <WiFiClient.h>
 
 #include "index.h"
+#include "htmlToH.h"
 
 #define STASSID "Redmi_DF75"
 #define STAPSK "51194303"
@@ -28,8 +29,9 @@ int winHi = 0, winLo = 1024;              // store histeresis limits here
 int dataCur;                              // temporary storage of current index_pzem_data
 unsigned long microTimer, microSpent;     // stopWatch timer in microSec
 boolean ledState, ledStateOld;            // current logic state
-float meterWattage = 0;                        // store current meterWattage
-int constMeterImpsNum = 10000;                        // постояннная счётчика
+float meterWattage = 0;                   // store current meterWattage
+int constMeterImpsNum = 10000;            // постояннная счётчика
+int сurrentTransformerTransformationRatio = 1;            // коэффициент трансформации трансформтора тока
 float blincsPerHour;                      // store how much blinks can fill 1 hour
 int windowLo = 0;                         // bottom line of scale window in Wt
 int windowHi = 1000;                      // top line of scale window in Wt
@@ -41,17 +43,17 @@ void SetConstMeterImpsNum() {
 }
 
 void GetPzemsValues() {
-  float current1 = pzem1.current();
-  float power1 = pzem1.power() / 1000;
-  float energy1 = pzem1.energy() / 1000;
+  float current1 = pzem1.current() * сurrentTransformerTransformationRatio;
+  float power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
+  float energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
 
-  float current2 = pzem2.current();
-  float power2 = pzem2.power() / 1000;
-  float energy2 = pzem2.energy() / 1000;
+  float current2 = pzem2.current() * сurrentTransformerTransformationRatio;
+  float power2 = pzem2.power() / 1000 * сurrentTransformerTransformationRatio;
+  float energy2 = pzem2.energy() / 1000 * сurrentTransformerTransformationRatio;
 
-  float current3 = pzem3.current();
-  float power3 = pzem3.power() / 1000;
-  float energy3 = pzem3.energy() / 1000;
+  float current3 = pzem3.current() * сurrentTransformerTransformationRatio;
+  float power3 = pzem3.power() / 1000 * сurrentTransformerTransformationRatio;
+  float energy3 = pzem3.energy() / 1000 * сurrentTransformerTransformationRatio;
 
   float current = current1 + current2 + current3; 
   float power = power1 + power2 + power3; 
@@ -134,6 +136,7 @@ void resetPzemsEnergies() {
 }
 
 void handleRoot() {
+ //MakeStrFromWeb();
  String html_index_h = webpage;
  server.send(200, "text/html", html_index_h);
 }

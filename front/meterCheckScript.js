@@ -76,7 +76,9 @@ function getPZEMsData() {
         if (this.readyState == 4 && this.status == 200) {
             console.log(this.responseText);
             pzemVoltageMeterCheck1.value = this.responseText;
-        }
+        } /*else {
+            pzemVoltageMeterCheck1.value = "no data";
+        }*/
     };
     xhttp.open("GET", "pzem_values", true);
     xhttp.send();
