@@ -5,10 +5,8 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
-// #include <WiFiClient.h>
 
 #include "index.h"
-#include "htmlToH.h"
 
 #define STASSID "Redmi_DF75"
 #define STAPSK "51194303"
@@ -142,7 +140,6 @@ void handleRoot() {
 }
 
 void setup() {
-
 	pinMode(D4, OUTPUT); // onboard led
   // power for ds18b20. esp8266 max pin current - 12 mA, 18b20 max current - 1.5 mA, so max - 8 sensors
   pinMode(D8, OUTPUT);
@@ -158,7 +155,9 @@ void setup() {
   //Serial.println("");
   wifiMulti.addAP(ssid, password);
   Serial.println("");
-  Serial.print("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print("Connecting...");
+  }
   // Wait for connection
   while (wifiMulti.run() != WL_CONNECTED) {
     digitalWrite(D4, LOW);
@@ -203,12 +202,12 @@ void loop() {
   checkLogic(dataCur);                            // оцениваем состояние сенсора и сохраняем его значение в ledState
 
   if (ledStateOld && !ledState) {                 // ИНДикатор только что загорелся
-    //                                                 вычисление длины последнего импульса
-    microSpent = micros() - microTimer;           //    длина последнего импульса = текущее время - время прошлого перехода
-    microTimer = micros();                        //    запоминаем время этого перехода в таймер
-    //                                                 вычисление длины последнего импульса
-    blincsPerHour = 3600000000000 / microSpent;   //    сколько таких импульсов такой длины поместилось бы в часе
-    meterWattage = (blincsPerHour / constMeterImpsNum) /100;             //    нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
+    // вычисление длины последнего импульса
+    microSpent = micros() - microTimer;           // длина последнего импульса = текущее время - время прошлого перехода
+    microTimer = micros();                        // запоминаем время этого перехода в таймер
+    // вычисление длины последнего импульса
+    blincsPerHour = 3600000000000 / microSpent;   // сколько таких импульсов такой длины поместилось бы в часе
+    meterWattage = (blincsPerHour / constMeterImpsNum) /100; // нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
   }
 
   if (!ledStateOld && ledState) {                 // ИНДикатор только что погас
