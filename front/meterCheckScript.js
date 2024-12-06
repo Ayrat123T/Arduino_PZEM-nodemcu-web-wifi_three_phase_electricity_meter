@@ -70,6 +70,24 @@ function sendConstMeterImpsNumCheck() {
   xhttp.send();
 };
 
+сurrentTransformerTransformationRatio.addEventListener("change", sendсurrentTransformerTransformationRatio);
+
+function sendсurrentTransformerTransformationRatio() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        console.log(this.responseText);
+        pzemCurrentMeterCheck1.value = this.responseText;
+    } /*else {
+        pzemCurrentMeterCheck1.value = "no data";
+    }*/
+  };
+  xhttp.open("GET",
+    "сurrent_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatio.value,
+    true);
+  xhttp.send();
+};
+
 function getPZEMsData() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -107,6 +125,7 @@ function startMeterCheck(e) {
                 alert('Ктт не должен быть равен 0');
             } else {
                 sendConstMeterImpsNumCheck();
+                sendсurrentTransformerTransformationRatio();
                 getPZEMsData();
                 ResetPZEMs();
                 seconds = 0.0;

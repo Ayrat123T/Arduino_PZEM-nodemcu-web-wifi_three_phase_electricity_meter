@@ -36,8 +36,14 @@ int windowHi = 1000;                      // top line of scale window in Wt
 
 void SetConstMeterImpsNum() {
   String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
- constMeterImpsNum = constMeterImpsNumStr.toInt();
- server.send(200, "text/plane", String(pzem1.voltage()));
+  constMeterImpsNum = constMeterImpsNumStr.toInt();
+  server.send(200, "text/plane", String(pzem1.voltage()));
+}
+
+void SetСurrentTransformerTransformationRatio() {
+  String СurrentTransformerTransformationRatioStr = server.arg("сurrentTransformerTransformationRatio");
+  сurrentTransformerTransformationRatio = СurrentTransformerTransformationRatioStr.toInt();
+  server.send(200, "text/plane", String(pzem1.current() * сurrentTransformerTransformationRatio));
 }
 
 void GetPzemsValues() {
@@ -176,6 +182,7 @@ void setup() {
 
 // HTTP server setup
 	server.on("/", handleRoot);
+  server.on("/сurrent_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
   server.on("/pzem_values)", GetPzemsValues);
   server.on("/pzem_reset_energies)", resetPzemsEnergies);
