@@ -19,20 +19,20 @@ ESP8266WebServer server(80);
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-PZEM004Tv30 pzem1(D1, D2); // (RX,TX)connect to TX,RX of PZEM1
-PZEM004Tv30 pzem2(D5, D6);  // (RX,TX) connect to TX,RX of PZEM2
-PZEM004Tv30 pzem3(D7, D0);  // (RX,TX) connect to TX,RX of PZEM3
+PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
+PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
+PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
 
-int winHi = 0, winLo = 1024;              // store histeresis limits here
-int dataCur;                              // temporary storage of current index_pzem_data
-unsigned long microTimer, microSpent;     // stopWatch timer in microSec
-boolean ledState, ledStateOld;            // current logic state
-float meterWattage = 0;                   // store current meterWattage
-int constMeterImpsNum = 10000;            // постояннная счётчика
-int сurrentTransformerTransformationRatio = 1;            // коэффициент трансформации трансформтора тока
-float blincsPerHour;                      // store how much blinks can fill 1 hour
-int windowLo = 0;                         // bottom line of scale window in Wt
-int windowHi = 1000;                      // top line of scale window in Wt
+int winHi = 0, winLo = 1024;                  // store histeresis limits here
+int dataCur;                                  // temporary storage of current index_pzem_data
+unsigned long microTimer, microSpent;         // stopWatch timer in microSec
+boolean ledState, ledStateOld;                // current logic state
+float meterWattage = 0;                       // store current meterWattage
+int constMeterImpsNum = 10000;                // постояннная счётчика
+int сurrentTransformerTransformationRatio = 1;// коэффициент трансформации трансформтора тока
+float blincsPerHour;                          // store how much blinks can fill 1 hour
+int windowLo = 0;                             // bottom line of scale window in Wt
+int windowHi = 1000;                          // top line of scale window in Wt
 
 void SetConstMeterImpsNum() {
   String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
@@ -63,6 +63,7 @@ void GetPzemsValues() {
   float power = power1 + power2 + power3; 
   float energy = energy1 + energy2 + energy3; 
  
+  //отправляем ответ в формате json
   String json_pzem_data =
     "{ \"voltages\":[";
       json_pzem_data += pzem1.voltage();
@@ -140,25 +141,18 @@ void resetPzemsEnergies() {
 }
 
 void handleRoot() {
- //MakeStrFromWeb();
  String html_index_h = webpage;
  server.send(200, "text/html", html_index_h);
 }
 
 void setup() {
-	pinMode(D4, OUTPUT); // onboard led
-  // power for ds18b20. esp8266 max pin current - 12 mA, 18b20 max current - 1.5 mA, so max - 8 sensors
-  pinMode(D8, OUTPUT);
-  digitalWrite(D8, HIGH);
-  
   Serial.begin(115200);
 
-// wifi connection section
-  WiFi.mode(WIFI_OFF);        //Prevents reconnection issue (taking too long to connect)
+  // wifi connection section
+  WiFi.mode(WIFI_OFF);            //Prevents reconnection issue (taking too long to connect)
   delay(1000);
-  WiFi.mode(WIFI_STA);        //This line hides the viewing of ESP as wifi hotspot
+  WiFi.mode(WIFI_STA);              //This line hides the viewing of ESP as wifi hotspot
   //WiFi.begin(ssid, password);     //Connect to your WiFi router
-  //Serial.println("");
   wifiMulti.addAP(ssid, password);
   Serial.println("");
   while (WiFi.status() != WL_CONNECTED) {

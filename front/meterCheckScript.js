@@ -178,8 +178,7 @@ function calcMeterAccuracyAndShowRes(e) {
 };
 
 function clearALL() {
-/** добавить очистку всех полей
- */
+    ResetPZEMs();
     writeBtn.style.display = "none";
 };
 
