@@ -5,19 +5,25 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
-
+//#include <WiFiClient.h>
 #include "index.h"
 
 #define STASSID "Redmi_DF75"
 #define STAPSK "51194303"
+#define STASSID2 "Oasis"
+#define STAPSK2 "9046711599"
 #define ANALOG_PIN A0
 #define CLOSE_WIN_FACTOR 10               // 1/X for narrowing window each side
+#define ALARM_WT 1000
+#define SCALE_TOP 2000
 
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
+const char* ssid2 = STASSID2;
+const char* password2 = STAPSK2;
 
 PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
@@ -35,9 +41,18 @@ int windowLo = 0;                             // bottom line of scale window in 
 int windowHi = 1000;                          // top line of scale window in Wt
 
 void SetConstMeterImpsNum() {
+  //отправляем ответ в формате json
+  String json_pzem_data =
+    "{\"voltages\":[\"";
+      json_pzem_data += String(pzem1.voltage());
+      json_pzem_data += ",";
+      json_pzem_data += String(pzem2.voltage());
+      json_pzem_data += ",";
+      json_pzem_data += String(pzem3.voltage());
+      json_pzem_data += "]}";
   String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
   constMeterImpsNum = constMeterImpsNumStr.toInt();
-  server.send(200, "text/plane", String(pzem1.voltage()));
+  server.send(200, "application/json", json_pzem_data);
 }
 
 void SetСurrentTransformerTransformationRatio() {
@@ -46,7 +61,8 @@ void SetСurrentTransformerTransformationRatio() {
   server.send(200, "text/plane", String(pzem1.current() * сurrentTransformerTransformationRatio));
 }
 
-void GetPzemsValues() {
+void SendPzemsValues() {
+  String nodata = server.arg("nodata");
   float current1 = pzem1.current() * сurrentTransformerTransformationRatio;
   float power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
   float energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
@@ -65,69 +81,70 @@ void GetPzemsValues() {
  
   //отправляем ответ в формате json
   String json_pzem_data =
-    "{ \"voltages\":[";
-      json_pzem_data += pzem1.voltage();
+    "{\"voltages\":[";
+      json_pzem_data += String(pzem1.voltage());
       json_pzem_data += ',';
-      json_pzem_data += pzem2.voltage();
+      json_pzem_data += String(pzem2.voltage());
       json_pzem_data += ',';
-      json_pzem_data += pzem3.voltage();
+      json_pzem_data += String(pzem3.voltage());
       json_pzem_data += "],";
     json_pzem_data += "\"currents\":[";
-      json_pzem_data += current1;
+      json_pzem_data += String(current1);
       json_pzem_data += ',';
-      json_pzem_data += current2;
+      json_pzem_data += String(current2);
       json_pzem_data += ',';
-      json_pzem_data += current3;
+      json_pzem_data += String(current3);
       json_pzem_data += "],";
     json_pzem_data += "\"powers\":[";
-      json_pzem_data += power1;
+      json_pzem_data += String(power1);
       json_pzem_data += ',';
-      json_pzem_data += power2;
+      json_pzem_data += String(power2);
       json_pzem_data += ',';
-      json_pzem_data += power3;
+      json_pzem_data += String(power3);
       json_pzem_data += "],";
     json_pzem_data += "\"energies\":[";
-      json_pzem_data += energy1;
+      json_pzem_data += String(energy1);
       json_pzem_data += ',';
-      json_pzem_data += energy2;
+      json_pzem_data += String(energy2);
       json_pzem_data += ',';
-      json_pzem_data += energy3;
+      json_pzem_data += String(energy3);
       json_pzem_data += "],";
     json_pzem_data += "\"frequencies\":[";
-      json_pzem_data += pzem1.frequency();
+      json_pzem_data += String(pzem1.frequency());
       json_pzem_data += ',';
-      json_pzem_data += pzem2.frequency();
+      json_pzem_data += String(pzem2.frequency());
       json_pzem_data += ',';
-      json_pzem_data += pzem3.frequency();
+      json_pzem_data += String(pzem3.frequency());
       json_pzem_data += "],";
     json_pzem_data += "\"powerFactories\":[";
-      json_pzem_data += pzem1.pf();
+      json_pzem_data += String(pzem1.pf());
       json_pzem_data += ',';
-      json_pzem_data += pzem2.pf();
+      json_pzem_data += String(pzem2.pf());
       json_pzem_data += ',';
-      json_pzem_data += pzem3.pf();
+      json_pzem_data += String(pzem3.pf());
       json_pzem_data += "],";
     json_pzem_data += "\"FullValues\":{";
-      json_pzem_data += "current:";
-      json_pzem_data += current;
+      json_pzem_data += "\"current\":";
+      json_pzem_data += String(current);
       json_pzem_data += ',';
-      json_pzem_data += "power:";
-      json_pzem_data += power + ',';
-      json_pzem_data += "energy:";
-      json_pzem_data += energy;
+      json_pzem_data += "\"power\":";
+      json_pzem_data += String(power);
+      json_pzem_data += ',';
+      json_pzem_data += "\"energy\":";
+      json_pzem_data += String(energy);
       json_pzem_data += "},";
     json_pzem_data += "\"ResSMDValues\":{";
-      json_pzem_data += "SMDimpPeriod:";
-      json_pzem_data += double(microSpent) /1000000;
+      json_pzem_data += "\"SMDimpPeriod\":";
+      json_pzem_data += String(double(microSpent) /1000000);
       json_pzem_data += ',';
-      json_pzem_data += "SMDpower:";
-      json_pzem_data += meterWattage;
+      json_pzem_data += "\"SMDpower\":";
+      json_pzem_data += String(meterWattage);
       json_pzem_data += ',';
-      json_pzem_data += "SMDAccuraty:";
-      json_pzem_data += (power - meterWattage) / power * 100;
+      json_pzem_data += "\"SMDAccuraty\":";
+      json_pzem_data += String((power - meterWattage) / power * 100);
       json_pzem_data += "}}";
   
-  server.send(200, "text/plane", json_pzem_data);
+  server.send(200, "application/json", json_pzem_data);
 }
 
 void resetPzemsEnergies() {
@@ -140,24 +157,19 @@ void resetPzemsEnergies() {
   }
 }
 
-void handleRoot() {
- String html_index_h = webpage;
- server.send(200, "text/html", html_index_h);
-}
-
 void setup() {
   Serial.begin(115200);
 
   // wifi connection section
-  WiFi.mode(WIFI_OFF);            //Prevents reconnection issue (taking too long to connect)
+  WiFi.mode(WIFI_OFF);        //Prevents reconnection issue (taking too long to connect)
   delay(1000);
-  WiFi.mode(WIFI_STA);              //This line hides the viewing of ESP as wifi hotspot
+  WiFi.mode(WIFI_STA);        //This line hides the viewing of ESP as wifi hotspot
   //WiFi.begin(ssid, password);     //Connect to your WiFi router
+  //Serial.println("");
   wifiMulti.addAP(ssid, password);
+  wifiMulti.addAP(ssid2, password2);
   Serial.println("");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print("Connecting...");
-  }
+  Serial.print("Connecting");
   // Wait for connection
   while (wifiMulti.run() != WL_CONNECTED) {
     digitalWrite(D4, LOW);
@@ -178,7 +190,7 @@ void setup() {
 	server.on("/", handleRoot);
   server.on("/сurrent_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
-  server.on("/pzem_values)", GetPzemsValues);
+  server.on("/pzem_values)", SendPzemsValues);
   server.on("/pzem_reset_energies)", resetPzemsEnergies);
 	server.onNotFound(handle_NotFound);
 	server.begin();
@@ -191,6 +203,7 @@ void loop() {
   while (wifiMulti.run() != WL_CONNECTED) {
     digitalWrite(D4, LOW);
     delay(250);
+    Serial.print(".");
     digitalWrite(D4, HIGH);
     delay(250);
   }
@@ -202,6 +215,7 @@ void loop() {
   ledStateOld = ledState;                         // сохраняем в буфер старое значение уровня сенсора
   checkLogic(dataCur);                            // оцениваем состояние сенсора и сохраняем его значение в ledState
 
+
   if (ledStateOld && !ledState) {                 // ИНДикатор только что загорелся
     // вычисление длины последнего импульса
     microSpent = micros() - microTimer;           // длина последнего импульса = текущее время - время прошлого перехода
@@ -209,11 +223,23 @@ void loop() {
     // вычисление длины последнего импульса
     blincsPerHour = 3600000000000 / microSpent;   // сколько таких импульсов такой длины поместилось бы в часе
     meterWattage = (blincsPerHour / constMeterImpsNum) /100; // нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
+    if (meterWattage > ALARM_WT) {                     //  если нагрузка больше сигнального порога
+      windowLo = ALARM_WT;                        //    сменить шкалу нагрузки на тревожную
+      windowHi = SCALE_TOP;
+    } else {                                      //  если нагрузка ниже сигнального порога
+      windowLo = 0;                               //    установить шкалу нагрузки от 0 до уровня тревоги
+      windowHi = ALARM_WT;
+    }
   }
 
   if (!ledStateOld && ledState) {                 // ИНДикатор только что погас
     closeAnalogWindow();                          // ужимаем пороги окна сенсора, чтобы они хронически не росли.
   }
+}
+
+void handleRoot() {
+ String html_index_h = webpage;
+ server.send(200, "text/html", html_index_h);
 }
 
 void handle_NotFound() {
@@ -225,6 +251,9 @@ void initWindow() {
   while (millis() < startTimer) {
     dataCur = analogRead(ANALOG_PIN);
     findAnalogWindow(dataCur);
+    Serial.print("winLo value:"); Serial.print(winLo);
+    Serial.print(", dataCur value:"); Serial.print(dataCur);
+    Serial.print(", winHi value:"); Serial.print(winHi);
   }
 }
 

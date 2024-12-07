@@ -60,27 +60,33 @@ constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
 
 function sendConstMeterImpsNumCheck() {
   var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
+  xhttp.responseType = "json";
+  xhttp.send();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText);
-        pzemVoltageMeterCheck1.value = this.responseText;
+        console.log("sendConstMeterImpsNumCheck successful✔️\n\r" + xhttp.response);
+    } else {
+        console.log("sendConstMeterImpsNumCheck fallied⛔️");
     }
   };
-  xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
-  xhttp.send();
+  xhttp.onload = function () {
+    var PZEMvalues = xhttp.response;
+    pzemVoltageMeterCheck1.value = PZEMvalues.voltages[0];
+    pzemVoltageMeterCheck2.value = PZEMvalues.voltages[1];
+    pzemVoltageMeterCheck3.value = PZEMvalues.voltages[2];
+  };
 };
 
-сurrentTransformerTransformationRatio.addEventListener("change", sendсurrentTransformerTransformationRatio);
+сurrentTransformerTransformationRatio.addEventListener("change", sendCurrentTransformerTransformationRatio);
 
-function sendсurrentTransformerTransformationRatio() {
+function sendCurrentTransformerTransformationRatio() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         console.log(this.responseText);
         pzemCurrentMeterCheck1.value = this.responseText;
-    } /*else {
-        pzemCurrentMeterCheck1.value = "no data";
-    }*/
+    }
   };
   xhttp.open("GET",
     "сurrent_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatio.value,
@@ -90,16 +96,16 @@ function sendсurrentTransformerTransformationRatio() {
 
 function getPZEMsData() {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText);
-            pzemVoltageMeterCheck1.value = this.responseText;
-        } /*else {
-            pzemVoltageMeterCheck1.value = "no data";
-        }*/
-    };
-    xhttp.open("GET", "pzem_values", true);
+    xhttp.open("GET", "pzem_values");
+    xhttp.responseType = "json";
     xhttp.send();
+    xhttp.onload = function () {
+      var PZEMvalues = xhttp.response;
+      console.log(PZEMvalues);
+      pzemVoltageMeterCheck1.value = PZEMvalues.voltages[0];
+      pzemVoltageMeterCheck2.value = PZEMvalues.voltages[1];
+      pzemVoltageMeterCheck3.value = PZEMvalues.voltages[2];
+    };
 };
 
 setInterval(function() {
@@ -125,9 +131,8 @@ function startMeterCheck(e) {
                 alert('Ктт не должен быть равен 0');
             } else {
                 sendConstMeterImpsNumCheck();
-                sendсurrentTransformerTransformationRatio();
+                sendCurrentTransformerTransformationRatio();
                 getPZEMsData();
-                ResetPZEMs();
                 seconds = 0.0;
                 minutes = 0;
                 hours = 0;

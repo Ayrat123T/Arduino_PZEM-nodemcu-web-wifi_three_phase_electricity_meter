@@ -23,7 +23,7 @@ std::string WebToStr(std::ifstream& index_html_in) {
             if (line.find("<script src=") != -1) {
                 line.clear();
                 line = "<script>";
-                std::ifstream index_html_in("meterCheckScript.js");
+                std::ifstream index_html_in("script.js");
                 line += WebToStr(index_html_in);
                 line += "\n</script>";
             }
@@ -34,7 +34,7 @@ std::string WebToStr(std::ifstream& index_html_in) {
 }
 
 std::string MakeStrFromWeb() {
-    std::ifstream index_html_in("meterCheck.html"); // окрываем файл для чтения
+    std::ifstream index_html_in("index.html"); // окрываем файл для чтения
     std::string html = "const char webpage[] PROGMEM = R\"=====(";
     html += WebToStr(index_html_in);
     html += ")=====\";";
