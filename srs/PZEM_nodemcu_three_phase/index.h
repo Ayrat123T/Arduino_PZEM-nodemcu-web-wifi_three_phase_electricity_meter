@@ -173,7 +173,7 @@ input[type="checkbox"] {
                 <table class="input"><tr><td><label for ="PzemFullCurrentCheck"  id="PzemFullCurrentMeterLabel" class="labelMeterCheck">Iсум[А] = </label>
                     <input id="PzemFullCurrentCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
                 <table class="input"><tr><td><label for ="PzemFullPowerCheck" id="PzemFullPowerMeterLabel" class="labelMeterCheck">Pсум[кВт] = </label>
-                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
+                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullPowerCheck" required readonly/></td></tr></table>
                 <table class="input"><tr><td><label for ="PzemFullEnergyMeterCheck" id="PzemFullEnergyMeterLabel" class="labelMeterCheck">Wсум[кВт*ч] = </label>
                     <input id="PzemFullEnergyMeterCheck" type="number" class="inputMeterCheck" name="PzemFullEnergyMeterCheck" required readonly/></td></tr></table>
              </p>
@@ -182,11 +182,12 @@ input[type="checkbox"] {
                 <table class="input"><tr><td><label id="ImpsPeriodMeterLabel" class="labelMeterCheck">Tимп[с] = </label>
                     <input id="ImpsPeriodMeterCheck" type="number" class="inputMeterCheck" name="ImpsPeriodMeterCheck" title="период между импульсами" required readonly/></td></tr></table>
             </p>
-                <p class="input">
-                    <table class="input"><tr><td><span id="timer" class="input">00:00:00.0;</span></td></tr></table>
-                    <table class="input"><tr><td><span id="CalcMeterPower" class="input">P(ИПЭУ) = 0.0 Вт; </span></td></tr></table>
-                    <table class="input"><tr><td><span id="CalcMeterEnergy" class="input">W(ИПЭУ) = 0.0 кВт*ч;</span></td></tr></table>
-                    <table class="input"><tr><td><span id="CalcMeterAccuracy" class="input">Погрешность = 0.0 %</span></td></tr></table>
+            <p class="input"><span id="timer" class="input">00:00:00.0</span></p>
+            <p><table class="input"><tr><td><label id="CalcMeterPowerLabel" class="labelMeterCheck">Pипэу[кВт*ч] = </label>
+                <input id="CalcMeterPowerCheck" type="number" class="inputMeterCheck" name=CalcMeterPowerCheck"  title="мощность счётчика по импульсам" required readonly/></td></tr></table>
+            <table class="input"><tr><td><label id="CalcMeterAccuracyLabel" class="labelMeterCheck">Погрешность[%] = </label>
+                <input id="CalcMeterAccuracyCheck" type="number" class="inputMeterCheck" name="CalcMeterAccuracyCheck" title="Погрешность счётчика" required readonly/></td></tr></table>
+             </p>
                 <p><button id="StartMeterCheck" type="submit" class="button" name="StartMeterCheck">Старт▶</button>
                     <button type="reset" onclick="clearALL()" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
         </form>        <button id = "copyResultButton"        name = "copyResultButton"        class = "button"
@@ -217,12 +218,14 @@ let pzemFrequencyMeterCheck3 = document.getElementById('PzemFrequencyMeterCheck3
 let pzemPowerFactorMeterCheck1 = document.getElementById('PzemPowerFactorMeterCheck1');
 let pzemPowerFactorMeterCheck2 = document.getElementById('PzemPowerFactorMeterCheck2');
 let pzemPowerFactorMeterCheck3 = document.getElementById('PzemPowerFactorMeterCheck3');
+let pzemFullCurrentCheck = document.getElementById('PzemFullCurrentCheck');
+let pzemFullPowerCheck = document.getElementById('PzemFullPowerCheck');
+let pzemFullEnergyMeterCheck = document.getElementById('PzemFullEnergyMeterCheck');
 let kyImpsMeterCheck = document.getElementById('KYImpsMeterCheck');
 let impsPeriodMeterCheck = document.getElementById('ImpsPeriodMeterCheck');
 let timer = document.getElementById('timer');
-let calcMeterEnergy = document.getElementById('CalcMeterEnergy');
-let calcMeterPower = document.getElementById('CalcMeterPower');
-let calcMeterAccuracy = document.getElementById('CalcMeterAccuracy');
+let calcMeterPower = document.getElementById('CalcMeterPowerCheck');
+let calcMeterAccuracy = document.getElementById('CalcMeterAccuracyCheck');
 let seconds = 0.0;
 let minutes = 0;
 let hours = 0;
@@ -236,6 +239,33 @@ function CheckAllInputs() {    if (constMeterImpsNumCheck.value != '' &&        
     }
     return false;
 };
+function ViewAllESPdata(ESPdata) {
+    pzemVoltageMeterCheck1.value = ESPdata.voltages[0];
+    pzemVoltageMeterCheck2.value = ESPdata.voltages[1];
+    pzemVoltageMeterCheck3.value = ESPdata.voltages[2];
+    pzemCurrentMeterCheck1.value = ESPdata.currents[0];
+    pzemCurrentMeterCheck2.value = ESPdata.currents[1];
+    pzemCurrentMeterCheck3.value = ESPdata.currents[2];
+    pzemPowerMeterCheck1.value = ESPdata.powers[0];
+    pzemPowerMeterCheck2.value = ESPdata.powers[1];
+    pzemPowerMeterCheck3.value = ESPdata.powers[2];
+    pzemEnergyMeterCheck1.value = ESPdata.energies[0];
+    pzemEnergyMeterCheck2.value = ESPdata.energies[1];
+    pzemEnergyMeterCheck3.value = ESPdata.energies[2];
+    pzemFrequencyMeterCheck1.value = ESPdata.frequencies[0];
+    pzemFrequencyMeterCheck2.value = ESPdata.frequencies[1];
+    pzemFrequencyMeterCheck3.value = ESPdata.frequencies[2];
+    pzemPowerFactorMeterCheck1.value =ESPdata.powerFactories[0];
+    pzemPowerFactorMeterCheck2.value =ESPdata.powerFactories[1];
+    pzemPowerFactorMeterCheck3.value =ESPdata.powerFactories[2];
+    pzemFullCurrentCheck.value = ESPdata.FullValues.current;
+    pzemFullPowerCheck.value = ESPdata.FullValues.power;
+    pzemFullEnergyMeterCheck.value = ESPdata.FullValues.energy;
+    kyImpsMeterCheck.value = ESPdata.ResSMDValues.KYimpNumSumm;
+    impsPeriodMeterCheck.value = ESPdata.ResSMDValues.SMDimpPeriod;
+    calcMeterPower.value = ESPdata.ResSMDValues.SMDpower;
+    calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuraty;
+}
 constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
 function sendConstMeterImpsNumCheck() {
   var xhttp = new XMLHttpRequest();
@@ -244,46 +274,52 @@ function sendConstMeterImpsNumCheck() {
   xhttp.send();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-        console.log("sendConstMeterImpsNumCheck successful✔️\n\r" + xhttp.response);
-    } else {
-        console.log("sendConstMeterImpsNumCheck fallied⛔️");
-    }
+        console.log("sendConstMeterImpsNumCheck successful✔️\n\r");
+        console.log(xhttp.response);
+    } /*else {
+        console.log("sendConstMeterImpsNumCheck fallied⛔️");    }*/
   };
   xhttp.onload = function () {
-    var PZEMvalues = xhttp.response;
-    pzemVoltageMeterCheck1.value = PZEMvalues.voltages[0];
-    pzemVoltageMeterCheck2.value = PZEMvalues.voltages[1];
-    pzemVoltageMeterCheck3.value = PZEMvalues.voltages[2];
+    ViewAllESPdata(xhttp.response);
   };
+  delete xhttp;
 };
 сurrentTransformerTransformationRatio.addEventListener("change", sendCurrentTransformerTransformationRatio);
 function sendCurrentTransformerTransformationRatio() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText);
-        pzemCurrentMeterCheck1.value = this.responseText;
-    }
-  };  xhttp.open("GET",    "сurrent_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatio.value,
-    true);
-  xhttp.send();
+    var xhttp = new XMLHttpRequest();    xhttp.open("GET",        "сurrent_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatio.value,
+        true);
+    xhttp.responseType = "json";
+    xhttp.send();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+          console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
+          console.log(xhttp.response);
+      } /*else {
+          console.log("sendCurrentTransformerTransformationRatio fallied⛔️");      }*/
+    };
+    xhttp.onload = function () {
+        ViewAllESPdata(xhttp.response);
+    };
 };
 function getPZEMsData() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "pzem_values");
     xhttp.responseType = "json";
     xhttp.send();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log("getPZEMsData successful✔️\n\r");
+            console.log(xhttp.response);
+        } /*else {
+            console.log("sendCurrentTransformerTransformationRatio fallied⛔️");        }*/
+      };
     xhttp.onload = function () {
-      var PZEMvalues = xhttp.response;
-      console.log(PZEMvalues);
-      pzemVoltageMeterCheck1.value = PZEMvalues.voltages[0];
-      pzemVoltageMeterCheck2.value = PZEMvalues.voltages[1];
-      pzemVoltageMeterCheck3.value = PZEMvalues.voltages[2];
+        console.log(xhttp.response);
+        ViewAllESPdata(xhttp.response);
     };
 };
-setInterval(function() {
-  getPZEMsData();
-}, 1000);
+/*setInterval(function() {
+  getPZEMsData();}, 1000);*/
 function ResetPZEMs() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {

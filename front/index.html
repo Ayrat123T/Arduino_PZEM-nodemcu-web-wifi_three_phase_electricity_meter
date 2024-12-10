@@ -69,7 +69,7 @@
                 <table class="input"><tr><td><label for ="PzemFullCurrentCheck"  id="PzemFullCurrentMeterLabel" class="labelMeterCheck">Iсум[А] = </label>
                     <input id="PzemFullCurrentCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
                 <table class="input"><tr><td><label for ="PzemFullPowerCheck" id="PzemFullPowerMeterLabel" class="labelMeterCheck">Pсум[кВт] = </label>
-                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
+                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullPowerCheck" required readonly/></td></tr></table>
                 <table class="input"><tr><td><label for ="PzemFullEnergyMeterCheck" id="PzemFullEnergyMeterLabel" class="labelMeterCheck">Wсум[кВт*ч] = </label>
                     <input id="PzemFullEnergyMeterCheck" type="number" class="inputMeterCheck" name="PzemFullEnergyMeterCheck" required readonly/></td></tr></table>
              </p>
@@ -78,11 +78,12 @@
                 <table class="input"><tr><td><label id="ImpsPeriodMeterLabel" class="labelMeterCheck">Tимп[с] = </label>
                     <input id="ImpsPeriodMeterCheck" type="number" class="inputMeterCheck" name="ImpsPeriodMeterCheck" title="период между импульсами" required readonly/></td></tr></table>
             </p>
-                <p class="input">
-                    <table class="input"><tr><td><span id="timer" class="input">00:00:00.0;</span></td></tr></table>
-                    <table class="input"><tr><td><span id="CalcMeterPower" class="input">P(ИПЭУ) = 0.0 Вт; </span></td></tr></table>
-                    <table class="input"><tr><td><span id="CalcMeterEnergy" class="input">W(ИПЭУ) = 0.0 кВт*ч;</span></td></tr></table>
-                    <table class="input"><tr><td><span id="CalcMeterAccuracy" class="input">Погрешность = 0.0 %</span></td></tr></table>
+            <p class="input"><span id="timer" class="input">00:00:00.0</span></p>
+            <p><table class="input"><tr><td><label id="CalcMeterPowerLabel" class="labelMeterCheck">Pипэу[кВт*ч] = </label>
+                <input id="CalcMeterPowerCheck" type="number" class="inputMeterCheck" name=CalcMeterPowerCheck"  title="мощность счётчика по импульсам" required readonly/></td></tr></table>
+            <table class="input"><tr><td><label id="CalcMeterAccuracyLabel" class="labelMeterCheck">Погрешность[%] = </label>
+                <input id="CalcMeterAccuracyCheck" type="number" class="inputMeterCheck" name="CalcMeterAccuracyCheck" title="Погрешность счётчика" required readonly/></td></tr></table>
+             </p>
                 <p><button id="StartMeterCheck" type="submit" class="button" name="StartMeterCheck">Старт▶</button>
                     <button type="reset" onclick="clearALL()" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
         </form>

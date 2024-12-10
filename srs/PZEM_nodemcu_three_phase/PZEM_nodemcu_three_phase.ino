@@ -29,6 +29,7 @@ PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
 
+int KYimpNumSumm = 0;                         // текущее кол-во ипульсов
 int winHi = 0, winLo = 1024;                  // store histeresis limits here
 int dataCur;                                  // temporary storage of current index_pzem_data
 unsigned long microTimer, microSpent;         // stopWatch timer in microSec
@@ -40,29 +41,23 @@ float blincsPerHour;                          // store how much blinks can fill 
 int windowLo = 0;                             // bottom line of scale window in Wt
 int windowHi = 1000;                          // top line of scale window in Wt
 
+void SendPzemsValues();
+
 void SetConstMeterImpsNum() {
   //отправляем ответ в формате json
-  String json_pzem_data =
-    "{\"voltages\":[\"";
-      json_pzem_data += String(pzem1.voltage());
-      json_pzem_data += ",";
-      json_pzem_data += String(pzem2.voltage());
-      json_pzem_data += ",";
-      json_pzem_data += String(pzem3.voltage());
-      json_pzem_data += "]}";
   String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
   constMeterImpsNum = constMeterImpsNumStr.toInt();
-  server.send(200, "application/json", json_pzem_data);
+  SendPzemsValues();
 }
 
 void SetСurrentTransformerTransformationRatio() {
   String СurrentTransformerTransformationRatioStr = server.arg("сurrentTransformerTransformationRatio");
   сurrentTransformerTransformationRatio = СurrentTransformerTransformationRatioStr.toInt();
-  server.send(200, "text/plane", String(pzem1.current() * сurrentTransformerTransformationRatio));
+  SendPzemsValues();
 }
 
 void SendPzemsValues() {
-  String nodata = server.arg("nodata");
+  
   float current1 = pzem1.current() * сurrentTransformerTransformationRatio;
   float power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
   float energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
@@ -77,7 +72,7 @@ void SendPzemsValues() {
 
   float current = current1 + current2 + current3; 
   float power = power1 + power2 + power3; 
-  float energy = energy1 + energy2 + energy3; 
+  float energy = energy1 + energy2 + energy3;
  
   //отправляем ответ в формате json
   String json_pzem_data =
@@ -137,6 +132,9 @@ void SendPzemsValues() {
       json_pzem_data += "\"SMDimpPeriod\":";
       json_pzem_data += String(double(microSpent) /1000000);
       json_pzem_data += ',';
+      json_pzem_data += "\"KYimpNumSumm\":";
+      json_pzem_data += String(KYimpNumSumm);
+      json_pzem_data += ',';
       json_pzem_data += "\"SMDpower\":";
       json_pzem_data += String(meterWattage);
       json_pzem_data += ',';
@@ -148,6 +146,7 @@ void SendPzemsValues() {
 }
 
 void resetPzemsEnergies() {
+  KYimpNumSumm = 0;
   if (pzem1.resetEnergy() &&
       pzem2.resetEnergy() &&
       pzem3.resetEnergy()) {
@@ -201,11 +200,7 @@ void setup() {
 
 void loop() {
   while (wifiMulti.run() != WL_CONNECTED) {
-    digitalWrite(D4, LOW);
-    delay(250);
     Serial.print(".");
-    digitalWrite(D4, HIGH);
-    delay(250);
   }
   delay(100);
   server.handleClient();
@@ -222,12 +217,13 @@ void loop() {
     microTimer = micros();                        // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса
     blincsPerHour = 3600000000000 / microSpent;   // сколько таких импульсов такой длины поместилось бы в часе
+    KYimpNumSumm++;
     meterWattage = (blincsPerHour / constMeterImpsNum) /100; // нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
-    if (meterWattage > ALARM_WT) {                     //  если нагрузка больше сигнального порога
-      windowLo = ALARM_WT;                        //    сменить шкалу нагрузки на тревожную
+    if (meterWattage > ALARM_WT) {                // если нагрузка больше сигнального порога
+      windowLo = ALARM_WT;                        // сменить шкалу нагрузки на тревожную
       windowHi = SCALE_TOP;
-    } else {                                      //  если нагрузка ниже сигнального порога
-      windowLo = 0;                               //    установить шкалу нагрузки от 0 до уровня тревоги
+    } else {                                      // если нагрузка ниже сигнального порога
+      windowLo = 0;                               // установить шкалу нагрузки от 0 до уровня тревоги
       windowHi = ALARM_WT;
     }
   }
