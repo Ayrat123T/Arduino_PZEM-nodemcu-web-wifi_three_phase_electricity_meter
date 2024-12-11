@@ -116,8 +116,8 @@ input[type="checkbox"] {
     <body class="main_body">
         <form name="MeterCheck">
             <p><table class="input"><tr><td>
-                <label for="CurrentTransformerTransformationRatio">Ктт = </label>
-                <input id="CurrentTransformerTransformationRatio" class="input" type="number" name="CurrentTransformerTransformationRatio" placeholder="1" value="1" required min="0" title="коэффициент трансформации трансформатора тока"/></td></tr></table>
+                <label for="CurrentTransformerTransformationRatioCheck">Ктт = </label>
+                <input id="CurrentTransformerTransformationRatioCheck" class="input" type="number" name="CurrentTransformerTransformationRatioCheck" placeholder="1" value="1" required min="0" title="коэффициент трансформации трансформатора тока"/></td></tr></table>
                 <table class="input"><tr><td><label for="ConstMeterImpsNumCheck" >A[имп/кВ*ч] = </label>
                     <input id="ConstMeterImpsNumCheck" class="input" type="number" name="ConstMeterImpsNumCheck" list = "impsList" required title="постоянная счётчика" min = "0"/></td></tr></table>
                     <datalist id="impsList">
@@ -189,7 +189,7 @@ input[type="checkbox"] {
                 <input id="CalcMeterAccuracyCheck" type="number" class="inputMeterCheck" name="CalcMeterAccuracyCheck" title="Погрешность счётчика" required readonly/></td></tr></table>
              </p>
                 <p><button id="StartMeterCheck" type="submit" class="button" name="StartMeterCheck">Старт▶</button>
-                    <button type="reset" onclick="clearALL()" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
+                    <button type="reset" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
         </form>        <button id = "copyResultButton"        name = "copyResultButton"        class = "button"
         style="display: none">📋 Скопировать результат</button>
         <br>
@@ -197,7 +197,7 @@ input[type="checkbox"] {
         <div class="footer" id="CopyRights"><p><a href="https://gridcom-rt.ru/" class="footer">© 2024 GridCom</a></p>
             <a href="mailto:airattu@mail.ru" class="footer">📧 airattu@mail.ru</a></div>
 <script>
-let сurrentTransformerTransformationRatio = document.getElementById('CurrentTransformerTransformationRatio');
+let сurrentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
 let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
 let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
 let pzemVoltageMeterCheck1 = document.getElementById('PzemVoltageMeterCheck1');
@@ -229,15 +229,24 @@ let calcMeterAccuracy = document.getElementById('CalcMeterAccuracyCheck');
 let seconds = 0.0;
 let minutes = 0;
 let hours = 0;
-let interval;
+let PZEMinterval;
+let timerInterval;let ESPsurveyPeriod = 1000; // период опроса ESP
 let StartMeterCheckBtn = document.getElementById('StartMeterCheck');
 let resetBtn = document.getElementById('resetMeterCheck');
 StartMeterCheckBtn.addEventListener('click', startMeterCheck);
-function CheckAllInputs() {    if (constMeterImpsNumCheck.value != '' &&        сurrentTransformerTransformationRatio.value >= 0 &&
-        сurrentTransformerTransformationRatio.value != '') {
-        return true;
-    }
-    return false;
+function CheckConstMeterImpsNumInputs() {    if (constMeterImpsNumCheck.value == ''
+        || constMeterImpsNumCheck.value <= 0) {
+            alert('A[имп/кВ*ч] должна быть больше 0');
+            return false;
+        }
+    return true;
+}
+function CheckCurrentTransformerTransformationRatioInputs() {    if (сurrentTransformerTransformationRatioCheck.value == ''
+        || сurrentTransformerTransformationRatioCheck.value <= 0) {
+            alert('Ктт должен быть больше 0');
+            return false;
+        }
+    return true;
 };
 function ViewAllESPdata(ESPdata) {
     pzemVoltageMeterCheck1.value = ESPdata.voltages[0];
@@ -268,93 +277,78 @@ function ViewAllESPdata(ESPdata) {
 }
 constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
 function sendConstMeterImpsNumCheck() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
-  xhttp.responseType = "json";
-  xhttp.send();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-        console.log("sendConstMeterImpsNumCheck successful✔️\n\r");
-        console.log(xhttp.response);
-    } /*else {
-        console.log("sendConstMeterImpsNumCheck fallied⛔️");    }*/
-  };
-  xhttp.onload = function () {
-    ViewAllESPdata(xhttp.response);
-  };
-  delete xhttp;
+    if (CheckConstMeterImpsNumInputs()) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
+        xhttp.responseType = "json";
+        xhttp.send();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log("sendConstMeterImpsNumCheck successful✔️\n\r");
+            }
+        };
+        xhttp.onload = function () {
+            ViewAllESPdata(xhttp.response);
+        };
+    }
 };
-сurrentTransformerTransformationRatio.addEventListener("change", sendCurrentTransformerTransformationRatio);
+сurrentTransformerTransformationRatioCheck.addEventListener("change", sendCurrentTransformerTransformationRatio);
 function sendCurrentTransformerTransformationRatio() {
-    var xhttp = new XMLHttpRequest();    xhttp.open("GET",        "сurrent_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatio.value,
-        true);
+    if (CheckCurrentTransformerTransformationRatioInputs()) {
+        var xhttp = new XMLHttpRequest();        xhttp.open("GET",            "current_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatioCheck.value,
+            true);
+        xhttp.responseType = "json";
+        xhttp.send();
+        xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
+        }
+        };
+        xhttp.onload = function () {
+            ViewAllESPdata(xhttp.response);
+        };
+    }
+};
+function getPZEMsData() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "pzem_values", true);
     xhttp.responseType = "json";
     xhttp.send();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-          console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
-          console.log(xhttp.response);
-      } /*else {
-          console.log("sendCurrentTransformerTransformationRatio fallied⛔️");      }*/
+          console.log("getPZEMsData successful✔️\n\r");
+      }
     };
     xhttp.onload = function () {
         ViewAllESPdata(xhttp.response);
     };
 };
-function getPZEMsData() {
+function Reset() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "pzem_values");
-    xhttp.responseType = "json";
+    xhttp.open("GET", "reset", true);
+    xhttp.responseType = "text";
     xhttp.send();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log("getPZEMsData successful✔️\n\r");
-            console.log(xhttp.response);
-        } /*else {
-            console.log("sendCurrentTransformerTransformationRatio fallied⛔️");        }*/
-      };
     xhttp.onload = function () {
-        console.log(xhttp.response);
-        ViewAllESPdata(xhttp.response);
+        console.log(this.responseText);
     };
-};
-/*setInterval(function() {
-  getPZEMsData();}, 1000);*/
-function ResetPZEMs() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText);
-        }
-    };
-    xhttp.open("GET", "pzem_reset_energies", true);
-    xhttp.send();
 };
 function startMeterCheck(e) {
-    if (CheckAllInputs()) {
-        e.preventDefault();
-        if (StartMeterCheckBtn.innerText == 'Старт▶') {
-            if (сurrentTransformerTransformationRatio.value <= 0) {
-                alert('Ктт не должен быть равен 0');
-            } else {
-                sendConstMeterImpsNumCheck();
-                sendCurrentTransformerTransformationRatio();
-                getPZEMsData();
-                seconds = 0.0;
-                minutes = 0;
-                hours = 0;
-                energy = 0.0;
-                interval = setInterval(updateTime, 100);
-                StartMeterCheckBtn.innerText = 'Стоп⛔️';
-                StartMeterCheckBtn.style["background-color"] = "red";
-                writeBtn.style["display"] = "none";
-            }
-        } else {
-            clearInterval(interval);
-            StartMeterCheckBtn.innerText = 'Старт▶';
-            StartMeterCheckBtn.style["background-color"] = "#77dd77";
-            calcMeterAccuracyAndShowRes(e);
+    if (StartMeterCheckBtn.innerText == 'Старт▶') {        if (CheckConstMeterImpsNumInputs()
+            && CheckCurrentTransformerTransformationRatioInputs()) {
+            e.preventDefault();
+            PZEMinterval = setInterval(getPZEMsData, ESPsurveyPeriod);
+            timerInterval = setInterval(updateTime, 100);
+            StartMeterCheckBtn.innerText = 'Стоп⛔️';
+            StartMeterCheckBtn.style["background-color"] = "red";
+            writeBtn.style["display"] = "none";
         }
+    } else {
+        e.preventDefault();
+        clearInterval(PZEMinterval);
+        clearInterval(timerInterval);
+        StartMeterCheckBtn.innerText = 'Старт▶';
+        StartMeterCheckBtn.style["background-color"] = "#77dd77";
+        writeBtn.style["display"] = "";
     }
 };
 function updateTime() {
@@ -370,31 +364,26 @@ function updateTime() {
     timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toFixed(1).toString().padStart(2, '0')}`;
 };
 resetBtn.addEventListener('click', () => {
-    clearInterval(interval);
-    ResetPZEMs();
+    clearInterval(PZEMinterval);
+    setTimeout(() => {
+        console.log(" джём, пока придут последние значения с pzem");
+      }, ESPsurveyPeriod + 100);
+    clearInterval(timerInterval);
+    Reset();
     seconds = 0.0;
     minutes = 0;
     hours = 0;
     timer.textContent = '00:00:00.0';
     StartMeterCheckBtn.innerText = 'Старт▶';
     StartMeterCheckBtn.style["background-color"] = "#77dd77";
-});
-function calcMeterAccuracyAndShowRes(e) {
-    writeBtn.style["display"] = "";
-    clearInterval(interval);
-    StartMeterCheckBtn.innerText = 'Старт▶';
-    StartMeterCheckBtn.style["background-color"] = "#77dd77";
-};
-function clearALL() {
-    ResetPZEMs();
     writeBtn.style.display = "none";
-};
+});
 const writeBtn = document.getElementById("copyResultButton");
 writeBtn.addEventListener("click", copyResult);
 function copyResult(e) {
     e.preventDefault();
     var inp = document.createElement('input');
-        var now = new Date();        inp.value = now + ';    \n\r\Номер ИПУ: ' + document.getElementById('SMDSerialNumMeterCheck').value + ';    \n\r\Время: ' + timer.textContent + ';    \n\r\Ктт = ' + сurrentTransformerTransformationRatio.value + ' о.е.;    \n\r\U1 = ' + pzemVoltageMeterCheck1.value.toString() + ' В;    \n\r\I1 = ' + pzemCurrentMeterCheck1.value.toString() + ' A;    \n\r\U2 = ' + pzemVoltageMeterCheck2.value.toString() + ' В;    \n\r\I2 = ' + pzemCurrentMeterCheck2.value.toString() + ' A;    \n\r\U3 = ' + pzemVoltageMeterCheck3.value.toString() + ' В;    \n\r\I3 = ' + pzemCurrentMeterCheck3.value.toString() + ' A;    \n\r'+ calcMeterPower.textContent + ';    \n\r'+ calcMeterEnergy.textContent + ';    \n\r\A = ' + constMeterImpsNumCheck.value.toString() + ' имп/кВ*ч;   \n\r\
+        var now = new Date();        inp.value = now + ';    \n\r\Номер ИПУ: ' + document.getElementById('SMDSerialNumMeterCheck').value + ';    \n\r\Время: ' + timer.textContent + ';    \n\r\Ктт = ' + сurrentTransformerTransformationRatioCheck.value + ' о.е.;    \n\r\U1 = ' + pzemVoltageMeterCheck1.value.toString() + ' В;    \n\r\I1 = ' + pzemCurrentMeterCheck1.value.toString() + ' A;    \n\r\U2 = ' + pzemVoltageMeterCheck2.value.toString() + ' В;    \n\r\I2 = ' + pzemCurrentMeterCheck2.value.toString() + ' A;    \n\r\U3 = ' + pzemVoltageMeterCheck3.value.toString() + ' В;    \n\r\I3 = ' + pzemCurrentMeterCheck3.value.toString() + ' A;    \n\r'+ calcMeterPower.textContent + ';    \n\r\A = ' + constMeterImpsNumCheck.value.toString() + ' имп/кВ*ч;   \n\r\
 n = ' + kyImpsMeterCheck.value.toString() + ' имп;    \n\r';
     document.body.appendChild(inp);
     inp.select();

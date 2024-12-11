@@ -29,17 +29,17 @@ PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
 
-int KYimpNumSumm = 0;                         // текущее кол-во ипульсов
-int winHi = 0, winLo = 1024;                  // store histeresis limits here
-int dataCur;                                  // temporary storage of current index_pzem_data
-unsigned long microTimer, microSpent;         // stopWatch timer in microSec
-boolean ledState, ledStateOld;                // current logic state
-float meterWattage = 0;                       // store current meterWattage
-int constMeterImpsNum = 10000;                // постояннная счётчика
-int сurrentTransformerTransformationRatio = 1;// коэффициент трансформации трансформтора тока
-float blincsPerHour;                          // store how much blinks can fill 1 hour
-int windowLo = 0;                             // bottom line of scale window in Wt
-int windowHi = 1000;                          // top line of scale window in Wt
+int KYimpNumSumm = 0;                          // текущее кол-во импульсов
+int winHi = 0, winLo = 1024;                   // store histeresis limits here
+int dataCur;                                   // temporary storage of current index_pzem_data
+unsigned long microTimer, microSpent;          // stopWatch timer in microSec
+boolean ledState, ledStateOld;                 // current logic state
+float meterWattage = 0;                        // store current meterWattage
+int constMeterImpsNum = 10000;                 // постояннная счётчика
+int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
+float blincsPerHour = 0;                       // store how much blinks can fill 1 hour
+int windowLo = 0;                              // bottom line of scale window in Wt
+int windowHi = 1000;                           // top line of scale window in Wt
 
 void SendPzemsValues();
 
@@ -57,8 +57,7 @@ void SetСurrentTransformerTransformationRatio() {
 }
 
 void SendPzemsValues() {
-  
-  float current1 = pzem1.current() * сurrentTransformerTransformationRatio;
+  double current1 = pzem1.current() * сurrentTransformerTransformationRatio;
   float power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
   float energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
 
@@ -71,7 +70,7 @@ void SendPzemsValues() {
   float energy3 = pzem3.energy() / 1000 * сurrentTransformerTransformationRatio;
 
   float current = current1 + current2 + current3; 
-  float power = power1 + power2 + power3; 
+  double power = power1 + power2 + power3; 
   float energy = energy1 + energy2 + energy3;
  
   //отправляем ответ в формате json
@@ -145,8 +144,15 @@ void SendPzemsValues() {
   server.send(200, "application/json", json_pzem_data);
 }
 
-void resetPzemsEnergies() {
+void Reset() {
   KYimpNumSumm = 0;
+  winHi = 0, winLo = 1024;
+  meterWattage = 0;
+  constMeterImpsNum = 10000; 
+  сurrentTransformerTransformationRatio = 1;
+  blincsPerHour = 0;
+  windowLo = 0;
+  windowHi = 1000;
   if (pzem1.resetEnergy() &&
       pzem2.resetEnergy() &&
       pzem3.resetEnergy()) {
@@ -187,10 +193,10 @@ void setup() {
 
 // HTTP server setup
 	server.on("/", handleRoot);
-  server.on("/сurrent_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
+  server.on("/current_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
-  server.on("/pzem_values)", SendPzemsValues);
-  server.on("/pzem_reset_energies)", resetPzemsEnergies);
+  server.on("/pzem_values", SendPzemsValues);
+  server.on("/reset", Reset);
 	server.onNotFound(handle_NotFound);
 	server.begin();
 	Serial.println("HTTP server started");
@@ -244,12 +250,11 @@ void handle_NotFound() {
 
 void initWindow() {
   unsigned long startTimer = millis() + 5000;
+   Serial.print("initialization light window");
   while (millis() < startTimer) {
     dataCur = analogRead(ANALOG_PIN);
     findAnalogWindow(dataCur);
-    Serial.print("winLo value:"); Serial.print(winLo);
-    Serial.print(", dataCur value:"); Serial.print(dataCur);
-    Serial.print(", winHi value:"); Serial.print(winHi);
+    Serial.print(". ");
   }
 }
 
