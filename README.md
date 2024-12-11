@@ -15,6 +15,8 @@ http://arduino.esp8266.com/stable/package_esp8266com_index.json
 
 ![alt text](Resources/image2.png)
 
+![alt text](Resources/body.png)
+
 ![alt text](Resources/image.png)
 
 ![alt text](Resources/front.png)
