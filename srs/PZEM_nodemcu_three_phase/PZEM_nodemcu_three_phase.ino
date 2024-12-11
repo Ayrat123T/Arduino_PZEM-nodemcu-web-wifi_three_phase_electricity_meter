@@ -240,7 +240,7 @@ void loop() {
 }
 
 void handleRoot() {
- String html_index_h = webpage;
+ String html_index_h = webpage; //для обновления HTML/css/js в строку "webpage" в "index.h" запустите "front/htmlToH.exe"
  server.send(200, "text/html", html_index_h);
 }
 
