@@ -1,7 +1,11 @@
 # Arduino_PZEM-nodemcu-web-wifi_three_phase_electricity_meter
 ### 3-фазный энергомонитор на Arduino (esp8266) с wifi и веб-интерфейсом с функцией автоматической проверки прибора учёта.
-### Позволяет считать импульсы с проверяемого счётчика автоматически с помощью фотосенсора. Выводит в веб-интефейс результаты измерений и расчёта погрешности прибора учёта.
+### Позволяет считать импульсы с проверяемого счётчика автоматически с помощью фотосенсора. Выводит в веб-интерфейс результаты измерений и расчёта погрешности прибора учёта.
 ![alt text](Resources/scheme.png)
+
+![alt text](Resources/meter_test_scheme.png)
+
+![alt text](Resources/Architecture.png)
 
 ## Комплектующие:
 1. [ESP8266 NodeMCU V3](https://arduinomaster.ru/platy-arduino/esp8266-nodemcu-v3-lua/)
