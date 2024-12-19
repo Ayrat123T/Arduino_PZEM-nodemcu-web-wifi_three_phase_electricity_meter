@@ -2,7 +2,7 @@ const char webpage[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html lang="ru">
     <head>
-        <title>Автоматическая проверка ИПУЭ</title>
+        <title>Энергомонитор SmartGridComMeter</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="user-scalable=no">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">

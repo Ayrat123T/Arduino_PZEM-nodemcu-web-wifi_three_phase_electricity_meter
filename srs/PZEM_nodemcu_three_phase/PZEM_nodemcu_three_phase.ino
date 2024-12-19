@@ -57,88 +57,163 @@ void SetСurrentTransformerTransformationRatio() {
 }
 
 void SendPzemsValues() {
-  double current1 = pzem1.current() * сurrentTransformerTransformationRatio;
-  float power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
-  float energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
 
-  float current2 = pzem2.current() * сurrentTransformerTransformationRatio;
-  float power2 = pzem2.power() / 1000 * сurrentTransformerTransformationRatio;
-  float energy2 = pzem2.energy() / 1000 * сurrentTransformerTransformationRatio;
+  float current = 0; //суммарный ток
+  float power = 0; //суммарная мощность
+  float energy = 0; //суммарная энергия
+  String str_current = "0.0"; //суммарный ток
+  String str_power = "0.0"; //суммарная мощность
+  String str_energy = "0.0"; //суммарная энергия
 
-  float current3 = pzem3.current() * сurrentTransformerTransformationRatio;
-  float power3 = pzem3.power() / 1000 * сurrentTransformerTransformationRatio;
-  float energy3 = pzem3.energy() / 1000 * сurrentTransformerTransformationRatio;
+  float voltage1 = pzem1.voltage();
+  float current1;
+  float power1;
+  float energy1;
+  String str_voltage1 = "0.0";
+  String str_current1 = "0.0";
+  String str_frequency1 = "0.0";
+  String str_pf1 = "0.0";
+  String str_power1 = "0.0";
+  String str_energy1 = "0.0";
+  if (!isnan(voltage1)) {
+    str_voltage1 = String(voltage1);
+    current1 = pzem1.current() * сurrentTransformerTransformationRatio;
+    str_current1 = String(current1);
+    current += current1;
+    str_frequency1 = String(pzem1.frequency());
+    str_pf1 = String(pzem1.pf());
+    power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
+    str_power1 = String(power1);
+    power += power1;
+    energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
+    str_energy1 = String(energy1);
+    energy += energy1;
+  }
 
-  float current = current1 + current2 + current3; 
-  double power = power1 + power2 + power3; 
-  float energy = energy1 + energy2 + energy3;
- 
+  float voltage2 = pzem2.voltage();
+  float current2;
+  float power2;
+  float energy2;
+  String str_voltage2 = "0.0";
+  String str_current2 = "0.0";
+  String str_frequency2 = "0.0";
+  String str_pf2 = "0.0";
+  String str_power2 = "0.0";
+  String str_energy2 = "0.0";
+  if (!isnan(voltage2)) {
+    str_voltage2 = String(voltage2);
+    current2 = pzem2.current() * сurrentTransformerTransformationRatio;
+    str_current2 = String(current2);
+    current += current2;
+    str_frequency2 = String(pzem2.frequency());
+    str_pf2 = String(pzem2.pf());
+    power2 = pzem2.power() / 1000 * сurrentTransformerTransformationRatio;
+    str_power2 = String(power2);
+    power += power2;
+    energy2 = pzem2.energy() / 1000 * сurrentTransformerTransformationRatio;
+    str_energy2 = String(energy2);
+    energy += energy2;
+  }
+
+  float voltage3 = pzem3.voltage();
+  float current3;
+  float power3;
+  float energy3;
+  String str_voltage3 = "0.0";
+  String str_current3 = "0.0";
+  String str_frequency3 = "0.0";
+  String str_pf3 = "0.0";
+  String str_power3 = "0.0";
+  String str_energy3 = "0.0";
+  if (!isnan(voltage3)) {
+    str_voltage3 = String(voltage3);
+    current3 = pzem3.current() * сurrentTransformerTransformationRatio;
+    str_current3 = String(current3);
+    current += current3;
+    str_frequency3 = String(pzem3.frequency());
+    str_pf3 = String(pzem3.pf());
+    power3 = pzem3.power() / 1000 * сurrentTransformerTransformationRatio;
+    str_power3 = String(power3);
+    power += power3;
+    energy3 = pzem3.energy() / 1000 * сurrentTransformerTransformationRatio;
+    str_energy3 = String(energy3);
+    energy += energy3;
+  }
+
+
+  if (current > 0) str_current = String(current);
+  if (power > 0) str_power = String(power);
+  if (energy > 0) str_energy = String(energy);
+
+  String SMDAccuraty = "1000";
+  if (power) SMDAccuraty = String((power - meterWattage) / power * 100);
+
   //отправляем ответ в формате json
   String json_pzem_data =
     "{\"voltages\":[";
-      json_pzem_data += String(pzem1.voltage());
-      json_pzem_data += ',';
-      json_pzem_data += String(pzem2.voltage());
-      json_pzem_data += ',';
-      json_pzem_data += String(pzem3.voltage());
+      json_pzem_data += str_voltage1;
+      json_pzem_data += ",";
+      json_pzem_data += str_voltage2;
+      json_pzem_data += ",";
+      json_pzem_data += str_voltage3;
       json_pzem_data += "],";
     json_pzem_data += "\"currents\":[";
-      json_pzem_data += String(current1);
-      json_pzem_data += ',';
-      json_pzem_data += String(current2);
-      json_pzem_data += ',';
-      json_pzem_data += String(current3);
+      json_pzem_data += str_current1;
+      json_pzem_data += ",";
+      json_pzem_data += str_current2;
+      json_pzem_data += ",";
+      json_pzem_data += str_current3;
       json_pzem_data += "],";
     json_pzem_data += "\"powers\":[";
-      json_pzem_data += String(power1);
-      json_pzem_data += ',';
-      json_pzem_data += String(power2);
-      json_pzem_data += ',';
-      json_pzem_data += String(power3);
+      json_pzem_data += str_power1;
+      json_pzem_data += ",";
+      json_pzem_data += str_power2;
+      json_pzem_data += ",";
+      json_pzem_data += str_power3;
       json_pzem_data += "],";
     json_pzem_data += "\"energies\":[";
-      json_pzem_data += String(energy1);
-      json_pzem_data += ',';
-      json_pzem_data += String(energy2);
-      json_pzem_data += ',';
-      json_pzem_data += String(energy3);
+      json_pzem_data += str_energy1;
+      json_pzem_data += ",";
+      json_pzem_data += str_energy2;
+      json_pzem_data += ",";
+      json_pzem_data += str_energy3;
       json_pzem_data += "],";
     json_pzem_data += "\"frequencies\":[";
-      json_pzem_data += String(pzem1.frequency());
-      json_pzem_data += ',';
-      json_pzem_data += String(pzem2.frequency());
-      json_pzem_data += ',';
-      json_pzem_data += String(pzem3.frequency());
+      json_pzem_data += str_frequency1;
+      json_pzem_data += ",";
+      json_pzem_data += str_frequency2;
+      json_pzem_data += ",";
+      json_pzem_data += str_frequency3;
       json_pzem_data += "],";
     json_pzem_data += "\"powerFactories\":[";
-      json_pzem_data += String(pzem1.pf());
-      json_pzem_data += ',';
-      json_pzem_data += String(pzem2.pf());
-      json_pzem_data += ',';
-      json_pzem_data += String(pzem3.pf());
+      json_pzem_data += str_pf1;
+      json_pzem_data += ",";
+      json_pzem_data += str_pf2;
+      json_pzem_data += ",";
+      json_pzem_data += str_pf3;
       json_pzem_data += "],";
     json_pzem_data += "\"FullValues\":{";
       json_pzem_data += "\"current\":";
-      json_pzem_data += String(current);
-      json_pzem_data += ',';
+      json_pzem_data += str_current;
+      json_pzem_data += ",";
       json_pzem_data += "\"power\":";
-      json_pzem_data += String(power);
-      json_pzem_data += ',';
+      json_pzem_data += str_power;
+      json_pzem_data += ",";
       json_pzem_data += "\"energy\":";
-      json_pzem_data += String(energy);
+      json_pzem_data += str_energy;
       json_pzem_data += "},";
     json_pzem_data += "\"ResSMDValues\":{";
       json_pzem_data += "\"SMDimpPeriod\":";
       json_pzem_data += String(double(microSpent) /1000000);
-      json_pzem_data += ',';
+      json_pzem_data += ",";
       json_pzem_data += "\"KYimpNumSumm\":";
       json_pzem_data += String(KYimpNumSumm);
-      json_pzem_data += ',';
+      json_pzem_data += ",";
       json_pzem_data += "\"SMDpower\":";
       json_pzem_data += String(meterWattage);
-      json_pzem_data += ',';
+      json_pzem_data += ",";
       json_pzem_data += "\"SMDAccuraty\":";
-      json_pzem_data += String((power - meterWattage) / power * 100);
+      json_pzem_data += SMDAccuraty;
       json_pzem_data += "}}";
   
   server.send(200, "application/json", json_pzem_data);
