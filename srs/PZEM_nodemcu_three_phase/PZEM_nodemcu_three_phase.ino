@@ -5,11 +5,12 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
+#include <ArduinoJson.h>
 //#include <WiFiClient.h>
 #include "index.h"
 
 #define STASSID "Redmi_DF75"
-#define STAPSK "51194303"
+#define STAPSK "51194303" 
 #define STASSID2 "Oasis"
 #define STAPSK2 "9046711599"
 #define ANALOG_PIN A0
@@ -29,6 +30,31 @@ PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
 
+  float current = 0.0; //суммарный ток
+  float power = 0.0; //суммарная мощность
+  float energy = 0.0; //суммарная энергия
+
+  float voltage1 = 0.0;
+  float current1= 0.0;
+  float power1= 0.0;
+  float energy1= 0.0;
+  float frequency1= 0.0;
+  float pf1= 0.0;
+
+  float voltage2 = 0.0;
+  float current2= 0.0;
+  float power2= 0.0;
+  float energy2= 0.0;
+  float frequency2= 0.0;
+  float pf2= 0.0;
+
+  float voltage3 =0.0;
+  float current3= 0.0;
+  float power3= 0.0;
+  float energy3= 0.0;
+  float frequency3= 0.0;
+  float pf3= 0.0;
+
 int KYimpNumSumm = 0;                          // текущее кол-во импульсов
 int winHi = 0, winLo = 1024;                   // store histeresis limits here
 int dataCur;                                   // temporary storage of current index_pzem_data
@@ -37,9 +63,10 @@ boolean ledState, ledStateOld;                 // current logic state
 float meterWattage = 0;                        // store current meterWattage
 int constMeterImpsNum = 10000;                 // постояннная счётчика
 int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
-float blincsPerHour = 0;                       // store how much blinks can fill 1 hour
+float blincsPerHour = 0.0;                       // store how much blinks can fill 1 hour
 int windowLo = 0;                              // bottom line of scale window in Wt
 int windowHi = 1000;                           // top line of scale window in Wt
+int WtTokWtScale = 1000;
 
 void SendPzemsValues();
 
@@ -56,173 +83,119 @@ void SetСurrentTransformerTransformationRatio() {
   SendPzemsValues();
 }
 
-void SendPzemsValues() {
-
-  float current = 0; //суммарный ток
-  float power = 0; //суммарная мощность
-  float energy = 0; //суммарная энергия
-  String str_current = "0.0"; //суммарный ток
-  String str_power = "0.0"; //суммарная мощность
-  String str_energy = "0.0"; //суммарная энергия
-
-  float voltage1 = pzem1.voltage();
-  float current1;
-  float power1;
-  float energy1;
-  String str_voltage1 = "0.0";
-  String str_current1 = "0.0";
-  String str_frequency1 = "0.0";
-  String str_pf1 = "0.0";
-  String str_power1 = "0.0";
-  String str_energy1 = "0.0";
-  if (!isnan(voltage1)) {
-    str_voltage1 = String(voltage1);
+void SetPzem1Values() {
+  voltage1 = 0.0;
+  current1= 0.0;
+  power1= 0.0;
+  energy1= 0.0;
+  frequency1= 0.0;
+  pf1= 0.0;
+  if (!isnan(voltage1 = pzem1.voltage())) {
     current1 = pzem1.current() * сurrentTransformerTransformationRatio;
-    str_current1 = String(current1);
     current += current1;
-    str_frequency1 = String(pzem1.frequency());
-    str_pf1 = String(pzem1.pf());
-    power1 = pzem1.power() / 1000 * сurrentTransformerTransformationRatio;
-    str_power1 = String(power1);
+    frequency1 = pzem1.frequency();
+    pf1 = pzem1.pf();
+    power1 = pzem1.power() / WtTokWtScale * сurrentTransformerTransformationRatio;
     power += power1;
-    energy1 = pzem1.energy() / 1000 * сurrentTransformerTransformationRatio;
-    str_energy1 = String(energy1);
+    energy1 = pzem1.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;
     energy += energy1;
   }
+}
 
-  float voltage2 = pzem2.voltage();
-  float current2;
-  float power2;
-  float energy2;
-  String str_voltage2 = "0.0";
-  String str_current2 = "0.0";
-  String str_frequency2 = "0.0";
-  String str_pf2 = "0.0";
-  String str_power2 = "0.0";
-  String str_energy2 = "0.0";
-  if (!isnan(voltage2)) {
-    str_voltage2 = String(voltage2);
+void SetPzem2Values() {
+  voltage2 = 0.0;
+  current2= 0.0;
+  power2= 0.0;
+  energy2= 0.0;
+  frequency2= 0.0;
+  pf2= 0.0;
+  if (!isnan(voltage2 = pzem2.voltage())) {
     current2 = pzem2.current() * сurrentTransformerTransformationRatio;
-    str_current2 = String(current2);
     current += current2;
-    str_frequency2 = String(pzem2.frequency());
-    str_pf2 = String(pzem2.pf());
-    power2 = pzem2.power() / 1000 * сurrentTransformerTransformationRatio;
-    str_power2 = String(power2);
+    frequency2 = pzem2.frequency();
+    pf2 = pzem2.pf();
+    power2 = pzem2.power() / WtTokWtScale * сurrentTransformerTransformationRatio;
     power += power2;
-    energy2 = pzem2.energy() / 1000 * сurrentTransformerTransformationRatio;
-    str_energy2 = String(energy2);
+    energy2 = pzem2.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;
     energy += energy2;
   }
+}
 
-  float voltage3 = pzem3.voltage();
-  float current3;
-  float power3;
-  float energy3;
-  String str_voltage3 = "0.0";
-  String str_current3 = "0.0";
-  String str_frequency3 = "0.0";
-  String str_pf3 = "0.0";
-  String str_power3 = "0.0";
-  String str_energy3 = "0.0";
-  if (!isnan(voltage3)) {
-    str_voltage3 = String(voltage3);
+void SetPzem3Values() {
+  voltage3 =0.0;
+  current3= 0.0;
+  power3= 0.0;
+  energy3= 0.0;
+  frequency3= 0.0;
+  pf3= 0.0;
+  if (!isnan(voltage3 = pzem3.voltage())) {
     current3 = pzem3.current() * сurrentTransformerTransformationRatio;
-    str_current3 = String(current3);
     current += current3;
-    str_frequency3 = String(pzem3.frequency());
-    str_pf3 = String(pzem3.pf());
-    power3 = pzem3.power() / 1000 * сurrentTransformerTransformationRatio;
-    str_power3 = String(power3);
+    frequency3 = pzem3.frequency();
+    pf3 = pzem3.pf();
+    power3 = pzem3.power() / WtTokWtScale * сurrentTransformerTransformationRatio;
     power += power3;
-    energy3 = pzem3.energy() / 1000 * сurrentTransformerTransformationRatio;
-    str_energy3 = String(energy3);
+    energy3 = pzem3.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;
     energy += energy3;
   }
+}
 
+void SendPzemsValues() {
+  current = 0.0;
+  power = 0.0;
+  energy = 0.0;
 
-  if (current > 0) str_current = String(current);
-  if (power > 0) str_power = String(power);
-  if (energy > 0) str_energy = String(energy);
+  SetPzem1Values();
+  SetPzem2Values();
+  SetPzem3Values();
 
-  String SMDAccuraty = "1000";
-  if (power) SMDAccuraty = String((power - meterWattage) / power * 100);
+  float SMDAccuraty = 1000.0;
+  if (power) SMDAccuraty = (power - meterWattage) / power * 100.0;
 
   //отправляем ответ в формате json
-  String json_pzem_data =
-    "{\"voltages\":[";
-      json_pzem_data += str_voltage1;
-      json_pzem_data += ",";
-      json_pzem_data += str_voltage2;
-      json_pzem_data += ",";
-      json_pzem_data += str_voltage3;
-      json_pzem_data += "],";
-    json_pzem_data += "\"currents\":[";
-      json_pzem_data += str_current1;
-      json_pzem_data += ",";
-      json_pzem_data += str_current2;
-      json_pzem_data += ",";
-      json_pzem_data += str_current3;
-      json_pzem_data += "],";
-    json_pzem_data += "\"powers\":[";
-      json_pzem_data += str_power1;
-      json_pzem_data += ",";
-      json_pzem_data += str_power2;
-      json_pzem_data += ",";
-      json_pzem_data += str_power3;
-      json_pzem_data += "],";
-    json_pzem_data += "\"energies\":[";
-      json_pzem_data += str_energy1;
-      json_pzem_data += ",";
-      json_pzem_data += str_energy2;
-      json_pzem_data += ",";
-      json_pzem_data += str_energy3;
-      json_pzem_data += "],";
-    json_pzem_data += "\"frequencies\":[";
-      json_pzem_data += str_frequency1;
-      json_pzem_data += ",";
-      json_pzem_data += str_frequency2;
-      json_pzem_data += ",";
-      json_pzem_data += str_frequency3;
-      json_pzem_data += "],";
-    json_pzem_data += "\"powerFactories\":[";
-      json_pzem_data += str_pf1;
-      json_pzem_data += ",";
-      json_pzem_data += str_pf2;
-      json_pzem_data += ",";
-      json_pzem_data += str_pf3;
-      json_pzem_data += "],";
-    json_pzem_data += "\"FullValues\":{";
-      json_pzem_data += "\"current\":";
-      json_pzem_data += str_current;
-      json_pzem_data += ",";
-      json_pzem_data += "\"power\":";
-      json_pzem_data += str_power;
-      json_pzem_data += ",";
-      json_pzem_data += "\"energy\":";
-      json_pzem_data += str_energy;
-      json_pzem_data += "},";
-    json_pzem_data += "\"ResSMDValues\":{";
-      json_pzem_data += "\"SMDimpPeriod\":";
-      json_pzem_data += String(double(microSpent) /1000000);
-      json_pzem_data += ",";
-      json_pzem_data += "\"KYimpNumSumm\":";
-      json_pzem_data += String(KYimpNumSumm);
-      json_pzem_data += ",";
-      json_pzem_data += "\"SMDpower\":";
-      json_pzem_data += String(meterWattage);
-      json_pzem_data += ",";
-      json_pzem_data += "\"SMDAccuraty\":";
-      json_pzem_data += SMDAccuraty;
-      json_pzem_data += "}}";
-  
-  server.send(200, "application/json", json_pzem_data);
+  JsonDocument doc; // Allocate the JSON document
+  // Add an arrays
+  JsonArray data = doc["voltages"].to<JsonArray>();
+    data.add(voltage1);
+    data.add(voltage2);
+    data.add(voltage3);
+  data = doc["currents"].to<JsonArray>();
+    data.add(current1);
+    data.add(current2);
+    data.add(current3);
+  data = doc["powers"].to<JsonArray>();
+    data.add(power1);
+    data.add(power2);
+    data.add(power3);
+  data = doc["energies"].to<JsonArray>();
+    data.add(energy1);
+    data.add(energy2);
+    data.add(energy3);
+  data = doc["frequencies"].to<JsonArray>();
+    data.add(frequency1);
+    data.add(frequency2);
+    data.add(frequency3);
+  data = doc["powerFactories"].to<JsonArray>();
+    data.add(pf1);
+    data.add(pf2);
+    data.add(pf3);
+  JsonObject FullValues =  doc["FullValues"].to<JsonObject>();
+    FullValues["current"] = current;
+    FullValues["power"] = power;
+    FullValues["energy"] = energy;
+  JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();
+    ResSMDValues["SMDimpPeriod"] = double(microSpent) /1000000.0;
+    ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;
+    ResSMDValues["SMDpower"] = meterWattage;
+    ResSMDValues["SMDAccuraty"] = SMDAccuraty;
+
+  server.send(200, "application/json", doc.as<String>());
 }
 
 void Reset() {
   KYimpNumSumm = 0;
   winHi = 0, winLo = 1024;
-  meterWattage = 0;
+  meterWattage = 0.0;
   constMeterImpsNum = 10000; 
   сurrentTransformerTransformationRatio = 1;
   blincsPerHour = 0;

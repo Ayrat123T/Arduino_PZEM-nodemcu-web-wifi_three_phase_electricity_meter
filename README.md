@@ -5,8 +5,6 @@
 
 ![alt text](Resources/meter_test_scheme.png)
 
-![alt text](image.png)
-
 ![alt text](Resources/Architecture.png)
 
 ## Комплектующие:
