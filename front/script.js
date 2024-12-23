@@ -1,4 +1,4 @@
-let сurrentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
+let currentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
 
 let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
 
@@ -62,13 +62,45 @@ function CheckConstMeterImpsNumInputs() {
 }
 
 function CheckCurrentTransformerTransformationRatioInputs() {
-    if (сurrentTransformerTransformationRatioCheck.value == ''
-        || сurrentTransformerTransformationRatioCheck.value <= 0) {
+    if (currentTransformerTransformationRatioCheck.value == ''
+        || currentTransformerTransformationRatioCheck.value <= 0) {
             alert('Ктт должен быть больше 0');
             return false;
         }
     return true;
 };
+
+let allValuesToCSV = [[
+    'time',
+    'timer',
+'currentTransformerTransformationRatio',
+'constMeterImpsNum',
+'meterSerialNumMeter',
+'pzemVoltageMeter1',
+'pzemVoltageMeter2',
+'pzemVoltageMeter3',
+'pzemCurrentMeter1',
+'pzemCurrentMeter2',
+'pzemCurrentMeter3',
+'pzemPowerMeter1',
+'pzemPowerMeter2',
+'pzemPowerMeter3',
+'pzemEnergyMeter1',
+'pzemEnergyMeter2',
+'pzemEnergyMeter3',
+'pzemFrequencyMeter1',
+'pzemFrequencyMeter2',
+'pzemFrequencyMeter3',
+'pzemPowerFactorMeter1',
+'pzemPowerFactorMeter2',
+'pzemPowerFactorMeter3',
+'pzemFullCurrent',
+'pzemFullPower',
+'pzemFullEnergyMeter',
+'kyImpsMeter',
+'impsPeriodMeter',
+'calcMeterPower',
+'calcMeterAccuracy']];
 
 function ViewAllESPdata(ESPdata) {
     pzemVoltageMeterCheck1.value = ESPdata.voltages[0];
@@ -96,6 +128,75 @@ function ViewAllESPdata(ESPdata) {
     impsPeriodMeterCheck.value = ESPdata.ResSMDValues.SMDimpPeriod;
     calcMeterPower.value = ESPdata.ResSMDValues.SMDpower;
     calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuraty;
+    pushAllESPdataToCSVarray();
+}
+
+function formatDate(date) {
+    return date.getFullYear() + '/' +
+      (date.getMonth() + 1) + '/' +
+      date.getDate() + ' ' +
+      date.getHours() + ':' +
+      date.getMinutes() + ':' +
+      date.getSeconds();
+   }
+
+const downloadCsvBtn = document.getElementById("downloadCsvButton");
+downloadCsvBtn.addEventListener("click", DownloadCsv);
+
+function DownloadCsv() {
+        const csvContent = allValuesToCSV.map(row => 
+            row.map(field => 
+                `"${field.toString().replace(/"/g, '""')}"`
+            ).join(";")
+        ).join("\n");
+    
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const date = new Date();
+        link.download = formatDate(date) + 'exportSmartGridComMeterData.csv';
+        link.style.display = 'none';
+    
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+};
+
+function pushAllESPdataToCSVarray() {
+    downloadCsvBtn.style["display"] = "";
+    var now = new Date();
+    allValuesToCSV.push([
+        formatDate(now),
+        timer.textContent,
+        currentTransformerTransformationRatioCheck.value,
+        constMeterImpsNumCheck.value,
+        meterSerialNumMeterCheck.value,
+        pzemVoltageMeterCheck1.value,
+        pzemVoltageMeterCheck2.value,
+        pzemVoltageMeterCheck3.value,
+        pzemCurrentMeterCheck1.value,
+        pzemCurrentMeterCheck2.value,
+        pzemCurrentMeterCheck3.value,
+        pzemPowerMeterCheck1.value,
+        pzemPowerMeterCheck2.value,
+        pzemPowerMeterCheck3.value,
+        pzemEnergyMeterCheck1.value,
+        pzemEnergyMeterCheck2.value,
+        pzemEnergyMeterCheck3.value,
+        pzemFrequencyMeterCheck1.value,
+        pzemFrequencyMeterCheck2.value,
+        pzemFrequencyMeterCheck3.value,
+        pzemPowerFactorMeterCheck1.value,
+        pzemPowerFactorMeterCheck2.value,
+        pzemPowerFactorMeterCheck3.value,
+        pzemFullCurrentCheck.value,
+        pzemFullPowerCheck.value,
+        pzemFullEnergyMeterCheck.value,
+        kyImpsMeterCheck.value,
+        impsPeriodMeterCheck.value,
+        calcMeterPower.value,
+        calcMeterAccuracy.value]);
 }
 
 constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
@@ -117,13 +218,13 @@ function sendConstMeterImpsNumCheck() {
     }
 };
 
-сurrentTransformerTransformationRatioCheck.addEventListener("change", sendCurrentTransformerTransformationRatio);
+currentTransformerTransformationRatioCheck.addEventListener("change", sendCurrentTransformerTransformationRatio);
 
 function sendCurrentTransformerTransformationRatio() {
     if (CheckCurrentTransformerTransformationRatioInputs()) {
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET",
-            "current_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+сurrentTransformerTransformationRatioCheck.value,
+            "current_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
             true);
         xhttp.responseType = "json";
         xhttp.send();
@@ -173,6 +274,7 @@ function startMeterCheck(e) {
             StartMeterCheckBtn.innerText = 'Стоп⛔️';
             StartMeterCheckBtn.style["background-color"] = "red";
             writeBtn.style["display"] = "none";
+            
         }
     } else {
         e.preventDefault();

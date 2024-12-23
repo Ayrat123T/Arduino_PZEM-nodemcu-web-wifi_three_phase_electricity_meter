@@ -16,6 +16,10 @@
 2. https://github.com/esp8266/Arduino (в Arduino IDE: инструменты->плата->менеджер плат - "esp8266 by ESP8266")
 3. https://github.com/bblanchon/ArduinoJson  (в Arduino IDE: инструменты->управление библиотеками - "ArduinoJson") или https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
 
+### Особенности:
+Если не подавать напряжение, то другие параметры измеряться тоже не будут (токовы особенности устройства PZEM)
+Результат можно экспортировать в csv
+
 ### Если вы работаете с [Arduino IDE](https://docs.arduino.cc/software/ide/), Вам необходимо [подключить](https://robotclass.ru/articles/node-mcu-arduino-ide-setup/) дополнительные ссылки для Менеджера плат для NodeMCU:
 http://arduino.esp8266.com/stable/package_esp8266com_index.json
 ![alt text](Resources/image2.png)
@@ -26,8 +30,8 @@ http://arduino.esp8266.com/stable/package_esp8266com_index.json
 ### В разобранном виде:
 ![alt text](Resources/image.png)
 
-### так выглядит веб интерфейс:
+### веб интерфейс:
 ![alt text](Resources/front.png)
 
-### при желании можно выводить в монитор порта:
+### можно выводить в монитор порта:
 ![alt text](Resources/image-1.png)
