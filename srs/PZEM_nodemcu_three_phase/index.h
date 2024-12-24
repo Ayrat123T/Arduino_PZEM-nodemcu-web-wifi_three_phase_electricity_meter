@@ -248,8 +248,8 @@ function CheckCurrentTransformerTransformationRatioInputs() {    if (currentTran
             return false;
         }
     return true;
-};let allValuesToCSV = [[    'time',    'timer','currentTransformerTransformationRatio','constMeterImpsNum','meterSerialNumMeter','pzemVoltageMeter1','pzemVoltageMeter2','pzemVoltageMeter3','pzemCurrentMeter1','pzemCurrentMeter2','pzemCurrentMeter3','pzemPowerMeter1','pzemPowerMeter2','pzemPowerMeter3','pzemEnergyMeter1','pzemEnergyMeter2','pzemEnergyMeter3','pzemFrequencyMeter1','pzemFrequencyMeter2','pzemFrequencyMeter3','pzemPowerFactorMeter1','pzemPowerFactorMeter2','pzemPowerFactorMeter3','pzemFullCurrent','pzemFullPower','pzemFullEnergyMeter','kyImpsMeter','impsPeriodMeter','calcMeterPower',
-'calcMeterAccuracy']];
+};let allValuesToCSV = [[    'time',    'timer',    'currentTransformerTransformationRatio',    'constMeterImpsNum',    'meterSerialNum',    'pzemVoltage1',    'pzemVoltage2',    'pzemVoltage3',    'pzemCurrent1',    'pzemCurrent2',    'pzemCurrent3',    'pzemPower1',    'pzemPower2',    'pzemPower3',    'pzemEnergy1',    'pzemEnergy2',    'pzemEnergy3',    'pzemFrequency1',    'pzemFrequency2',    'pzemFrequency3',    'pzemPowerFactor1',    'pzemPowerFactor2',    'pzemPowerFactor3',    'pzemFullCurrent',    'pzemFullPower',    'pzemFullEnergy',    'kyImpsMeter',    'impsPeriodMeter',    'calcMeterPower',
+    'calcMeterAccuracy']];
 function ViewAllESPdata(ESPdata) {
     pzemVoltageMeterCheck1.value = ESPdata.voltages[0];
     pzemVoltageMeterCheck2.value = ESPdata.voltages[1];
@@ -279,7 +279,7 @@ function ViewAllESPdata(ESPdata) {
     pushAllESPdataToCSVarray();
 }
 function formatDate(date) {    return date.getFullYear() + '/' +      (date.getMonth() + 1) + '/' +      date.getDate() + ' ' +      date.getHours() + ':' +      date.getMinutes() + ':' +
-      date.getSeconds();
+      date.getSeconds() + ' ';
    }
 const downloadCsvBtn = document.getElementById("downloadCsvButton");
 downloadCsvBtn.addEventListener("click", DownloadCsv);

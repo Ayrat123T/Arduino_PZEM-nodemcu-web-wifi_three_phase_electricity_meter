@@ -3,16 +3,16 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoJson.h>
-//#include <WiFiClient.h>
+#include <WiFiClient.h>
 #include "index.h"
 
+#define APSSID "SmartGridComMeterESPap"
 #define STASSID "Redmi_DF75"
 #define STAPSK "51194303" 
-#define STASSID2 "Oasis"
-#define STAPSK2 "9046711599"
+#define STASSID2 "Admin"
+#define STAPSK2 "Admin" 
 #define ANALOG_PIN A0
 #define CLOSE_WIN_FACTOR 10               // 1/X for narrowing window each side
 #define ALARM_WT 1000
@@ -21,6 +21,7 @@
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);
 
+const char *ap_ssid = APSSID;
 const char* ssid = STASSID;
 const char* password = STAPSK;
 const char* ssid2 = STASSID2;
@@ -213,33 +214,42 @@ void Reset() {
 void setup() {
   Serial.begin(115200);
 
-  // wifi connection section
-  WiFi.mode(WIFI_OFF);        //Prevents reconnection issue (taking too long to connect)
+  WiFi.mode(WIFI_OFF); //Prevents reconnection issue (taking too long to connect)
   delay(1000);
-  WiFi.mode(WIFI_STA);        //This line hides the viewing of ESP as wifi hotspot
-  //WiFi.begin(ssid, password);     //Connect to your WiFi router
-  //Serial.println("");
+
+  // wifi add AP section
+  /*WiFi.mode(WIFI_AP);
+  Serial.println("Configuring access point...");
+  WiFi.softAP(APSSID);         //Starting AccessPoint on given credential
+  IPAddress myIP = WiFi.softAPIP();        //IP Address of our Esp8266 accesspoint(where we can host webpages, and see data)
+  Serial.print("Access Point Name: "); 
+  Serial.println(APSSID);
+  Serial.print("Access Point IP address: ");
+  Serial.println(myIP); // http://192.168.4.1/
+  Serial.println("");
+  delay(500);*/
+
+  // wifi connection section
+  WiFi.mode(WIFI_STA);
   wifiMulti.addAP(ssid, password);
   wifiMulti.addAP(ssid2, password2);
   Serial.println("");
   Serial.print("Connecting");
   // Wait for connection
-  while (wifiMulti.run() != WL_CONNECTED) {
-    digitalWrite(D4, LOW);
+  while (wifiMulti.run() != WL_CONNECTED) { 
     delay(250);
     Serial.print(".");
-    digitalWrite(D4, HIGH);
     delay(250);
   }
-
   //If connection successful show IP address in serial monitor
-  Serial.println("");
+  Serial.println(""); 
   Serial.print("Connected to Network/SSID: ");
   Serial.println(WiFi.SSID());
-  Serial.print("IP address: ");
+  Serial.print("IP address: "); //http://192.168.31.146/
   Serial.println(WiFi.localIP());  //IP address assigned to your ESP
+  delay(500);
 
-// HTTP server setup
+  // HTTP server setup
 	server.on("/", handleRoot);
   server.on("/current_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
@@ -253,9 +263,10 @@ void setup() {
 }
 
 void loop() {
+  /*// если хотите контролировать wifi подключение, например по светодиоду
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
-  }
+  }*/
   delay(100);
   server.handleClient();
 
@@ -263,7 +274,6 @@ void loop() {
   findAnalogWindow(dataCur);                      // расширяем окно, если значение выходит за его пределы
   ledStateOld = ledState;                         // сохраняем в буфер старое значение уровня сенсора
   checkLogic(dataCur);                            // оцениваем состояние сенсора и сохраняем его значение в ledState
-
 
   if (ledStateOld && !ledState) {                 // ИНДикатор только что загорелся
     // вычисление длины последнего импульса
@@ -302,6 +312,7 @@ void initWindow() {
   while (millis() < startTimer) {
     dataCur = analogRead(ANALOG_PIN);
     findAnalogWindow(dataCur);
+    delay(1000);
     Serial.print(". ");
   }
 }
