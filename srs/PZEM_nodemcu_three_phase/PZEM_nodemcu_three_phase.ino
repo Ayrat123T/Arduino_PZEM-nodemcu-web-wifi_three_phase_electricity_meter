@@ -8,8 +8,8 @@
 #include <WiFiClient.h>
 #include "index.h"
 
-#define APSSID "SmartGridComMeterESPap"
-#define STASSID "Redmi_DF75"
+#define APSSID "SmartGridComMeterESPap" // Имя точки доступа, которую создаст ESP
+#define STASSID "Redmi_DF75" //Точка доступа (или напишите свои), к которой подключится ESP
 #define STAPSK "51194303" 
 #define STASSID2 "Admin"
 #define STAPSK2 "Admin" 
@@ -215,7 +215,7 @@ void setup() {
   Serial.begin(115200);
 
   WiFi.mode(WIFI_OFF); //Prevents reconnection issue (taking too long to connect)
-  delay(1000);
+  delay(500);
 
   // wifi add AP section
   /*WiFi.mode(WIFI_AP);
@@ -230,7 +230,7 @@ void setup() {
   delay(500);*/
 
   // wifi connection section
-  WiFi.mode(WIFI_STA);
+  /*WiFi.mode(WIFI_STA);
   wifiMulti.addAP(ssid, password);
   wifiMulti.addAP(ssid2, password2);
   Serial.println("");
@@ -247,7 +247,41 @@ void setup() {
   Serial.println(WiFi.SSID());
   Serial.print("IP address: "); //http://192.168.31.146/
   Serial.println(WiFi.localIP());  //IP address assigned to your ESP
+  delay(500);*/
+
+  // wifi section
+  WiFi.mode(WIFI_STA);// wifi connection section
+  wifiMulti.addAP(ssid, password);
+  wifiMulti.addAP(ssid2, password2);
+  Serial.println("");
+  Serial.print("Connecting");
+  // Wait for connection
+  unsigned long connectionTimer = millis() + 5000;
+  while (millis() < connectionTimer && wifiMulti.run() != WL_CONNECTED) { 
+    delay(500);
+    Serial.print(".");
+  }
+  //If connection successful show IP address in serial monitor
+  if (wifiMulti.run() == WL_CONNECTED) {
+    Serial.println(""); 
+    Serial.print("Connected to Network/SSID: ");
+    Serial.println(WiFi.SSID());
+    Serial.print("IP address: "); //http://192.168.31.146/
+    Serial.println(WiFi.localIP());  //IP address assigned to your ESP
+  } else {
+    WiFi.mode(WIFI_AP); // wifi add AP section
+    Serial.println("Configuring access point...");
+    WiFi.softAP(APSSID);         //Starting AccessPoint on given credential
+    IPAddress myIP = WiFi.softAPIP();        //IP Address of our Esp8266 accesspoint(where we can host webpages, and see data)
+    Serial.print("Access Point Name: "); 
+    Serial.println(APSSID);
+    Serial.print("Access Point IP address: ");
+    Serial.println(myIP); // http://192.168.4.1/
+    Serial.println("");
+  }
   delay(500);
+
+
 
   // HTTP server setup
 	server.on("/", handleRoot);
