@@ -31,30 +31,30 @@ PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
 PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
 
-  float current = 0.0; //суммарный ток
-  float power = 0.0; //суммарная мощность
-  float energy = 0.0; //суммарная энергия
+  float current = 0; //суммарный ток
+  float power = 0; //суммарная мощность
+  float energy = 0; //суммарная энергия
 
-  float voltage1 = 0.0;
-  float current1= 0.0;
-  float power1= 0.0;
-  float energy1= 0.0;
-  float frequency1= 0.0;
-  float pf1= 0.0;
+  float voltage1 = 0;
+  float current1= 0;
+  float power1= 0;
+  float energy1= 0;
+  float frequency1= 0;
+  float pf1= 0;
 
-  float voltage2 = 0.0;
-  float current2= 0.0;
-  float power2= 0.0;
-  float energy2= 0.0;
-  float frequency2= 0.0;
-  float pf2= 0.0;
+  float voltage2 = 0;
+  float current2= 0;
+  float power2= 0;
+  float energy2= 0;
+  float frequency2= 0;
+  float pf2= 0;
 
-  float voltage3 =0.0;
-  float current3= 0.0;
-  float power3= 0.0;
-  float energy3= 0.0;
-  float frequency3= 0.0;
-  float pf3= 0.0;
+  float voltage3 =0;
+  float current3= 0;
+  float power3= 0;
+  float energy3= 0;
+  float frequency3= 0;
+  float pf3= 0;
 
 int KYimpNumSumm = 0;                          // текущее кол-во импульсов
 int winHi = 0, winLo = 1024;                   // store histeresis limits here
@@ -62,9 +62,9 @@ int dataCur;                                   // temporary storage of current i
 unsigned long microTimer, microSpent;          // stopWatch timer in microSec
 boolean ledState, ledStateOld;                 // current logic state
 float meterWattage = 0;                        // store current meterWattage
-int constMeterImpsNum = 10000;                 // постояннная счётчика
+int constMeterImpsNum = 1000;                 // постояннная счётчика
 int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
-float blincsPerHour = 0.0;                       // store how much blinks can fill 1 hour
+float blincsPerHour = 0;                       // store how much blinks can fill 1 hour
 int windowLo = 0;                              // bottom line of scale window in Wt
 int windowHi = 1000;                           // top line of scale window in Wt
 int WtTokWtScale = 1000;
@@ -85,12 +85,12 @@ void SetСurrentTransformerTransformationRatio() {
 }
 
 void SetPzem1Values() {
-  voltage1 = 0.0;
-  current1= 0.0;
-  power1= 0.0;
-  energy1= 0.0;
-  frequency1= 0.0;
-  pf1= 0.0;
+  voltage1 = 0;
+  current1= 0;
+  power1= 0;
+  energy1= 0;
+  frequency1= 0;
+  pf1= 0;
   if (!isnan(voltage1 = pzem1.voltage())) {
     current1 = pzem1.current() * сurrentTransformerTransformationRatio;
     current += current1;
@@ -104,12 +104,12 @@ void SetPzem1Values() {
 }
 
 void SetPzem2Values() {
-  voltage2 = 0.0;
-  current2= 0.0;
-  power2= 0.0;
-  energy2= 0.0;
-  frequency2= 0.0;
-  pf2= 0.0;
+  voltage2 = 0;
+  current2= 0;
+  power2= 0;
+  energy2= 0;
+  frequency2= 0;
+  pf2= 0;
   if (!isnan(voltage2 = pzem2.voltage())) {
     current2 = pzem2.current() * сurrentTransformerTransformationRatio;
     current += current2;
@@ -123,12 +123,12 @@ void SetPzem2Values() {
 }
 
 void SetPzem3Values() {
-  voltage3 =0.0;
-  current3= 0.0;
-  power3= 0.0;
-  energy3= 0.0;
-  frequency3= 0.0;
-  pf3= 0.0;
+  voltage3 =0;
+  current3= 0;
+  power3= 0;
+  energy3= 0;
+  frequency3= 0;
+  pf3= 0;
   if (!isnan(voltage3 = pzem3.voltage())) {
     current3 = pzem3.current() * сurrentTransformerTransformationRatio;
     current += current3;
@@ -142,16 +142,16 @@ void SetPzem3Values() {
 }
 
 void SendPzemsValues() {
-  current = 0.0;
-  power = 0.0;
-  energy = 0.0;
+  current = 0;
+  power = 0;
+  energy = 0;
 
   SetPzem1Values();
   SetPzem2Values();
   SetPzem3Values();
 
-  float SMDAccuraty = 1000.0;
-  if (power) SMDAccuraty = (power - meterWattage) / power * 100.0;
+  //float SMDAccuraty = 1000;
+  /*if (power)*/ float SMDAccuraty = (power - meterWattage) / power * 100;
 
   //отправляем ответ в формате json
   JsonDocument doc; // Allocate the JSON document
@@ -185,7 +185,7 @@ void SendPzemsValues() {
     FullValues["power"] = power;
     FullValues["energy"] = energy;
   JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();
-    ResSMDValues["SMDimpPeriod"] = double(microSpent) /1000000.0;
+    ResSMDValues["SMDimpPeriod"] = double(microSpent) /1000000;
     ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;
     ResSMDValues["SMDpower"] = meterWattage;
     ResSMDValues["SMDAccuraty"] = SMDAccuraty;
@@ -196,8 +196,8 @@ void SendPzemsValues() {
 void Reset() {
   KYimpNumSumm = 0;
   winHi = 0, winLo = 1024;
-  meterWattage = 0.0;
-  constMeterImpsNum = 10000; 
+  meterWattage = 0;
+  constMeterImpsNum = 1000; 
   сurrentTransformerTransformationRatio = 1;
   blincsPerHour = 0;
   windowLo = 0;
@@ -297,7 +297,7 @@ void setup() {
 }
 
 void loop() {
-  /*// если хотите контролировать wifi подключение, например по светодиоду
+  /*// если необходимо контролировать wifi подключение, например по светодиоду
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
   }*/
@@ -314,9 +314,9 @@ void loop() {
     microSpent = micros() - microTimer;           // длина последнего импульса = текущее время - время прошлого перехода
     microTimer = micros();                        // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса
-    blincsPerHour = 3600000000000 / microSpent;   // сколько таких импульсов такой длины поместилось бы в часе
+    blincsPerHour = 3600000000 / microSpent;   // сколько таких импульсов такой длины поместилось бы в часе
     KYimpNumSumm++;
-    meterWattage = (blincsPerHour / constMeterImpsNum) /100; // нагрузка (кВт) = кол-во таких импульсов в часе разделив на 6,4к имп (1кВт*ч) и умножить на 1000
+    meterWattage = (blincsPerHour / constMeterImpsNum); // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
     if (meterWattage > ALARM_WT) {                // если нагрузка больше сигнального порога
       windowLo = ALARM_WT;                        // сменить шкалу нагрузки на тревожную
       windowHi = SCALE_TOP;
@@ -342,13 +342,14 @@ void handle_NotFound() {
 
 void initWindow() {
   unsigned long startTimer = millis() + 5000;
-   Serial.print("initialization light window");
+  Serial.print("initialization light window");
   while (millis() < startTimer) {
     dataCur = analogRead(ANALOG_PIN);
     findAnalogWindow(dataCur);
     delay(1000);
     Serial.print(". ");
   }
+  Serial.println("initialization light window complited");
 }
 
 void findAnalogWindow(int analogData) {
