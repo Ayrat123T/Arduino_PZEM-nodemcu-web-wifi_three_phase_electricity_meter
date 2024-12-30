@@ -15,8 +15,6 @@
 #define STAPSK2 "Admin" 
 #define ANALOG_PIN A0
 #define CLOSE_WIN_FACTOR 10                // 1/X для сужения окна с каждой стороны
-#define ALARM_WT 1000
-#define SCALE_TOP 2000
 
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);
@@ -65,8 +63,6 @@ float meterWattage = 0;                        // текущая мощност�
 int constMeterImpsNum = 1000;                  // постояннная счётчика
 int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
 float blincsPerHour = 0;                       // кол-во импульсов в час
-int windowLo = 0;                              // нижняя строка окна шкалы в Wt
-int windowHi = 1000;                           // верхняя строка окна шкалы в Wt
 int WtTokWtScale = 1000;                       // коэффициент перевода Вт в кВт
 
 void SetPzem1Values() {
@@ -197,8 +193,6 @@ void Reset() {
   constMeterImpsNum = 1000; 
   сurrentTransformerTransformationRatio = 1;
   blincsPerHour = 0;
-  windowLo = 0;
-  windowHi = 1000;
   if (pzem1.resetEnergy() &&
       pzem2.resetEnergy() &&
       pzem3.resetEnergy()) {
@@ -211,7 +205,7 @@ void Reset() {
 void setup() {
   Serial.begin(115200);
 
-  WiFi.mode(WIFI_OFF); //Prevents reconnection issue (taking too long to connect)
+  WiFi.mode(WIFI_OFF); // Предотвращает проблемы с повторным подключением (слишком долгое подключение)
   delay(500);
 
   /*// раздел добавления точки доступа wifi
@@ -246,7 +240,7 @@ void setup() {
   Serial.println(WiFi.localIP());  // IP-адрес, назначенный ESP
   delay(500);*/
 
-  // раздел подключения к Wi-Fi
+  /*раздел подключения к Wi-Fi*/
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP(ssid, password);
   wifiMulti.addAP(ssid2, password2);
@@ -278,8 +272,6 @@ void setup() {
     Serial.println("");
   }
   delay(500);
-
-
 
   // Настройка HTTP-сервера
 	server.on("/", handleRoot);
@@ -314,13 +306,6 @@ void loop() {
     blincsPerHour = 3600000000 / microSpent;          // сколько таких импульсов такой длины поместилось бы в часе
     KYimpNumSumm++;
     meterWattage = blincsPerHour / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
-    if (meterWattage > ALARM_WT) {                    // если нагрузка больше сигнального порога
-      windowLo = ALARM_WT;                            // сменить шкалу нагрузки на тревожную
-      windowHi = SCALE_TOP;   
-    } else {                                          // если нагрузка ниже сигнального порога
-      windowLo = 0;                                   // установить шкалу нагрузки от 0 до уровня тревоги
-      windowHi = ALARM_WT;
-    }
   }
 
   if (!ledStateOld && ledState) { // ИНДикатор только что погас
