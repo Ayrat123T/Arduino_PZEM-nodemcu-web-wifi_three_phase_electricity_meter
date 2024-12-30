@@ -8,13 +8,13 @@
 #include <WiFiClient.h>
 #include "index.h"
 
-#define APSSID "SmartGridComMeterESPap" // Имя точки доступа, которую создаст ESP
-#define STASSID "Redmi_DF75" //Точка доступа (или напишите свои), к которой подключится ESP
+#define APSSID "SmartGridComMeterESPap"    // Имя точки доступа, которую создаст ESP
+#define STASSID "Redmi_DF75"               // Точка доступа (логин и пароль от wifi), к которой подключится ESP
 #define STAPSK "51194303" 
 #define STASSID2 "Admin"
 #define STAPSK2 "Admin" 
 #define ANALOG_PIN A0
-#define CLOSE_WIN_FACTOR 10               // 1/X for narrowing window each side
+#define CLOSE_WIN_FACTOR 10                // 1/X для сужения окна с каждой стороны
 #define ALARM_WT 1000
 #define SCALE_TOP 2000
 
@@ -27,13 +27,13 @@ const char* password = STAPSK;
 const char* ssid2 = STASSID2;
 const char* password2 = STAPSK2;
 
-PZEM004Tv30 pzem1(D1, D2); // (RX,TX) connect to TX,RX of PZEM1
-PZEM004Tv30 pzem2(D5, D6); // (RX,TX) connect to TX,RX of PZEM2
-PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
+PZEM004Tv30 pzem1(D1, D2); // (RX,TX) подключиться к TX,RX PZEM1
+PZEM004Tv30 pzem2(D5, D6); // (RX,TX) подключиться к TX,RX PZEM2
+PZEM004Tv30 pzem3(D7, D0); // (RX,TX) подключиться к TX,RX PZEM3
 
-  float current = 0; //суммарный ток
-  float power = 0; //суммарная мощность
-  float energy = 0; //суммарная энергия
+  float current = 0; // суммарный ток
+  float power = 0;   // суммарная мощность
+  float energy = 0;  // суммарная энергия
 
   float voltage1 = 0;
   float current1= 0;
@@ -57,32 +57,17 @@ PZEM004Tv30 pzem3(D7, D0); // (RX,TX) connect to TX,RX of PZEM3
   float pf3= 0;
 
 int KYimpNumSumm = 0;                          // текущее кол-во импульсов
-int winHi = 0, winLo = 1024;                   // store histeresis limits here
-int dataCur;                                   // temporary storage of current index_pzem_data
-unsigned long microTimer, microSpent;          // stopWatch timer in microSec
-boolean ledState, ledStateOld;                 // current logic state
-float meterWattage = 0;                        // store current meterWattage
-int constMeterImpsNum = 1000;                 // постояннная счётчика
+int winHi = 0, winLo = 1024;                   // пределы гистерезиса
+int dataCur;                                   // временное хранение текущих данных pzem
+unsigned long microTimer, microSpent;          // Стоп-таймер в микросекундах
+boolean ledState, ledStateOld;                 // текущее логическое состояние фоторезистора
+float meterWattage = 0;                        // текущая мощность счётчика
+int constMeterImpsNum = 1000;                  // постояннная счётчика
 int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
-float blincsPerHour = 0;                       // store how much blinks can fill 1 hour
-int windowLo = 0;                              // bottom line of scale window in Wt
-int windowHi = 1000;                           // top line of scale window in Wt
-int WtTokWtScale = 1000;
-
-void SendPzemsValues();
-
-void SetConstMeterImpsNum() {
-  //отправляем ответ в формате json
-  String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
-  constMeterImpsNum = constMeterImpsNumStr.toInt();
-  SendPzemsValues();
-}
-
-void SetСurrentTransformerTransformationRatio() {
-  String СurrentTransformerTransformationRatioStr = server.arg("сurrentTransformerTransformationRatio");
-  сurrentTransformerTransformationRatio = СurrentTransformerTransformationRatioStr.toInt();
-  SendPzemsValues();
-}
+float blincsPerHour = 0;                       // кол-во импульсов в час
+int windowLo = 0;                              // нижняя строка окна шкалы в Wt
+int windowHi = 1000;                           // верхняя строка окна шкалы в Wt
+int WtTokWtScale = 1000;                       // коэффициент перевода Вт в кВт
 
 void SetPzem1Values() {
   voltage1 = 0;
@@ -153,9 +138,9 @@ void SendPzemsValues() {
   //float SMDAccuraty = 1000;
   /*if (power)*/ float SMDAccuraty = (power - meterWattage) / power * 100;
 
-  //отправляем ответ в формате json
-  JsonDocument doc; // Allocate the JSON document
-  // Add an arrays
+  // отправляем ответ в формате json
+  JsonDocument doc; // создаём JSON документ
+  // Добавить массивы в JSON документ
   JsonArray data = doc["voltages"].to<JsonArray>();
     data.add(voltage1);
     data.add(voltage2);
@@ -193,6 +178,18 @@ void SendPzemsValues() {
   server.send(200, "application/json", doc.as<String>());
 }
 
+void SetConstMeterImpsNum() {
+  String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
+  constMeterImpsNum = constMeterImpsNumStr.toInt();
+  SendPzemsValues();
+}
+
+void SetСurrentTransformerTransformationRatio() {
+  String СurrentTransformerTransformationRatioStr = server.arg("сurrentTransformerTransformationRatio");
+  сurrentTransformerTransformationRatio = СurrentTransformerTransformationRatioStr.toInt();
+  SendPzemsValues();
+}
+
 void Reset() {
   KYimpNumSumm = 0;
   winHi = 0, winLo = 1024;
@@ -217,20 +214,20 @@ void setup() {
   WiFi.mode(WIFI_OFF); //Prevents reconnection issue (taking too long to connect)
   delay(500);
 
-  // wifi add AP section
-  /*WiFi.mode(WIFI_AP);
+  /*// раздел добавления точки доступа wifi
+  WiFi.mode(WIFI_AP);
   Serial.println("Configuring access point...");
-  WiFi.softAP(APSSID);         //Starting AccessPoint on given credential
-  IPAddress myIP = WiFi.softAPIP();        //IP Address of our Esp8266 accesspoint(where we can host webpages, and see data)
+  WiFi.softAP(APSSID);                     //Запуск AccessPoint с указанными учетными данными
+  IPAddress myIP = WiFi.softAPIP();        //IP-адрес нашей точки доступа Esp8266 (где мы можем размещать веб-страницы и просматривать данные)
   Serial.print("Access Point Name: "); 
   Serial.println(APSSID);
   Serial.print("Access Point IP address: ");
   Serial.println(myIP); // http://192.168.4.1/
   Serial.println("");
-  delay(500);*/
+  delay(500);
 
-  // wifi connection section
-  /*WiFi.mode(WIFI_STA);
+  // раздел подключения к Wi-Fi
+  WiFi.mode(WIFI_STA);
   wifiMulti.addAP(ssid, password);
   wifiMulti.addAP(ssid2, password2);
   Serial.println("");
@@ -241,38 +238,39 @@ void setup() {
     Serial.print(".");
     delay(250);
   }
-  //If connection successful show IP address in serial monitor
+  // Если подключение успешно, отображаем IP-адрес в последовательном мониторе
   Serial.println(""); 
   Serial.print("Connected to Network/SSID: ");
   Serial.println(WiFi.SSID());
   Serial.print("IP address: "); //http://192.168.31.146/
-  Serial.println(WiFi.localIP());  //IP address assigned to your ESP
+  Serial.println(WiFi.localIP());  // IP-адрес, назначенный ESP
   delay(500);*/
 
-  // wifi section
-  WiFi.mode(WIFI_STA);// wifi connection section
+  // раздел подключения к Wi-Fi
+  WiFi.mode(WIFI_STA);
   wifiMulti.addAP(ssid, password);
   wifiMulti.addAP(ssid2, password2);
   Serial.println("");
   Serial.print("Connecting");
-  // Wait for connection
+  // Ожидаем подключения
   unsigned long connectionTimer = millis() + 5000;
   while (millis() < connectionTimer && wifiMulti.run() != WL_CONNECTED) { 
     delay(500);
     Serial.print(".");
   }
-  //If connection successful show IP address in serial monitor
+  //  Если подключение успешно, отображаем IP-адрес в последовательном мониторе
   if (wifiMulti.run() == WL_CONNECTED) {
     Serial.println(""); 
     Serial.print("Connected to Network/SSID: ");
     Serial.println(WiFi.SSID());
     Serial.print("IP address: "); //http://192.168.31.146/
-    Serial.println(WiFi.localIP());  //IP address assigned to your ESP
+    Serial.println(WiFi.localIP());  // IP-адрес, назначенный ESP
   } else {
-    WiFi.mode(WIFI_AP); // wifi add AP section
+    // раздел добавления точки доступа wifi
+    WiFi.mode(WIFI_AP);
     Serial.println("Configuring access point...");
-    WiFi.softAP(APSSID);         //Starting AccessPoint on given credential
-    IPAddress myIP = WiFi.softAPIP();        //IP Address of our Esp8266 accesspoint(where we can host webpages, and see data)
+    WiFi.softAP(APSSID);                     //Запуск AccessPoint с указанными учетными данными
+  IPAddress myIP = WiFi.softAPIP();        //IP-адрес нашей точки доступа Esp8266 (где мы можем размещать веб-страницы и просматривать данные)
     Serial.print("Access Point Name: "); 
     Serial.println(APSSID);
     Serial.print("Access Point IP address: ");
@@ -283,7 +281,7 @@ void setup() {
 
 
 
-  // HTTP server setup
+  // Настройка HTTP-сервера
 	server.on("/", handleRoot);
   server.on("/current_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
@@ -301,33 +299,32 @@ void loop() {
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
   }*/
-  delay(100);
   server.handleClient();
 
-  dataCur = analogRead(ANALOG_PIN);               // запоминаем значение на сенсоре
-  findAnalogWindow(dataCur);                      // расширяем окно, если значение выходит за его пределы
-  ledStateOld = ledState;                         // сохраняем в буфер старое значение уровня сенсора
-  checkLogic(dataCur);                            // оцениваем состояние сенсора и сохраняем его значение в ledState
+  dataCur = analogRead(ANALOG_PIN);                   // запоминаем значение на сенсоре
+  findAnalogWindow(dataCur);                          // расширяем окно, если значение выходит за его пределы
+  ledStateOld = ledState;                             // сохраняем в буфер старое значение уровня сенсора
+  checkLogic(dataCur);                                // оцениваем состояние сенсора и сохраняем его значение в ledState
 
-  if (ledStateOld && !ledState) {                 // ИНДикатор только что загорелся
-    // вычисление длины последнего импульса
-    microSpent = micros() - microTimer;           // длина последнего импульса = текущее время - время прошлого перехода
-    microTimer = micros();                        // запоминаем время этого перехода в таймер
-    // вычисление длины последнего импульса
-    blincsPerHour = 3600000000 / microSpent;   // сколько таких импульсов такой длины поместилось бы в часе
+  if (ledStateOld && !ledState) {                     // ИНДикатор только что загорелся
+    // вычисление длины последнего импульса   
+    microSpent = micros() - microTimer;               // длина последнего импульса = текущее время - время прошлого перехода
+    microTimer = micros();                            // запоминаем время этого перехода в таймер
+    // вычисление длины последнего импульса   
+    blincsPerHour = 3600000000 / microSpent;          // сколько таких импульсов такой длины поместилось бы в часе
     KYimpNumSumm++;
-    meterWattage = (blincsPerHour / constMeterImpsNum); // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
-    if (meterWattage > ALARM_WT) {                // если нагрузка больше сигнального порога
-      windowLo = ALARM_WT;                        // сменить шкалу нагрузки на тревожную
-      windowHi = SCALE_TOP;
-    } else {                                      // если нагрузка ниже сигнального порога
-      windowLo = 0;                               // установить шкалу нагрузки от 0 до уровня тревоги
+    meterWattage = blincsPerHour / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
+    if (meterWattage > ALARM_WT) {                    // если нагрузка больше сигнального порога
+      windowLo = ALARM_WT;                            // сменить шкалу нагрузки на тревожную
+      windowHi = SCALE_TOP;   
+    } else {                                          // если нагрузка ниже сигнального порога
+      windowLo = 0;                                   // установить шкалу нагрузки от 0 до уровня тревоги
       windowHi = ALARM_WT;
     }
   }
 
-  if (!ledStateOld && ledState) {                 // ИНДикатор только что погас
-    closeAnalogWindow();                          // ужимаем пороги окна сенсора, чтобы они хронически не росли.
+  if (!ledStateOld && ledState) { // ИНДикатор только что погас
+    closeAnalogWindow();          // ужимаем пороги окна сенсора, чтобы они хронически не росли.
   }
 }
 
@@ -353,8 +350,8 @@ void initWindow() {
 }
 
 void findAnalogWindow(int analogData) {
-  if (analogData > winHi) winHi = analogData;         // запомнить значение как верхнее, если оно выше него
-  if (analogData < winLo) winLo = analogData;         // запомнить значение как нижнее, если оно ниже него
+  if (analogData > winHi) winHi = analogData; // запомнить значение как верхнее, если оно выше него
+  if (analogData < winLo) winLo = analogData; // запомнить значение как нижнее, если оно ниже него
 }
 
 void checkLogic(int analogData) {
@@ -367,7 +364,7 @@ void checkLogic(int analogData) {
 
 void closeAnalogWindow() {
   if (winLo < winHi - 30) {
-    int winDif = (winHi - winLo);                    // вычисляем ширину окна
+    int winDif = (winHi - winLo);                     // вычисляем ширину окна
     winHi = winHi - (winDif / CLOSE_WIN_FACTOR);      // вычитаем 1/10 ширины из верхнего порога
     winLo = winLo + (winDif / CLOSE_WIN_FACTOR);      // прибавляем 1/10 ширины к нижнему порогу
   }
