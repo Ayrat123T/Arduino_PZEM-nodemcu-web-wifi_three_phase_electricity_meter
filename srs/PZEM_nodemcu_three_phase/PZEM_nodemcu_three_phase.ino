@@ -8,13 +8,13 @@
 #include <WiFiClient.h>
 #include "index.h"
 
-#define APSSID "SmartGridComMeterESPap"    // Имя точки доступа, которую создаст ESP
-#define STASSID "Redmi_DF75"               // Точка доступа (логин и пароль от wifi), к которой подключится ESP
+#define APSSID "SmartGridComMeterESPap" // Имя точки доступа, которую создаст ESP
+#define STASSID "Redmi_DF75"            // Точка доступа (логин и пароль от wifi), к которой подключится ESP
 #define STAPSK "51194303" 
 #define STASSID2 "Admin"
 #define STAPSK2 "Admin" 
 #define ANALOG_PIN A0
-#define CLOSE_WIN_FACTOR 10                // 1/X для сужения окна с каждой стороны
+#define CLOSE_WIN_FACTOR 10             // 1/CLOSE_WIN_FACTOR для сужения окна с каждой стороны
 
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);
@@ -56,14 +56,14 @@ PZEM004Tv30 pzem3(D7, D0); // (RX,TX) подключиться к TX,RX PZEM3
 
 int KYimpNumSumm = 0;                          // текущее кол-во импульсов
 int winHi = 0, winLo = 1024;                   // пределы гистерезиса
-int dataCur;                                   // временное хранение текущих данных pzem
+int dataCur;                                   // временное хранение текущих данных фоторезистора
 unsigned long microTimer, microSpent;          // Стоп-таймер в микросекундах
 boolean ledState, ledStateOld;                 // текущее логическое состояние фоторезистора
 float meterWattage = 0;                        // текущая мощность счётчика
 int constMeterImpsNum = 1000;                  // постояннная счётчика
-int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
 float blincsPerHour = 0;                       // кол-во импульсов в час
 int WtTokWtScale = 1000;                       // коэффициент перевода Вт в кВт
+int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
 
 void SetPzem1Values() {
   voltage1 = 0;
@@ -126,11 +126,13 @@ void SendPzemsValues() {
   current = 0;
   power = 0;
   energy = 0;
-
+  checkLedState(); // костыльно решаем проблему многозадачности
   SetPzem1Values();
+  checkLedState();
   SetPzem2Values();
+  checkLedState();
   SetPzem3Values();
-
+  checkLedState();
   //float SMDAccuraty = 1000;
   /*if (power)*/ float SMDAccuraty = (power - meterWattage) / power * 100;
 
@@ -161,11 +163,13 @@ void SendPzemsValues() {
     data.add(pf1);
     data.add(pf2);
     data.add(pf3);
+  // Добавить объекты в JSON документ
   JsonObject FullValues =  doc["FullValues"].to<JsonObject>();
     FullValues["current"] = current;
     FullValues["power"] = power;
     FullValues["energy"] = energy;
   JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();
+  checkLedState();
     ResSMDValues["SMDimpPeriod"] = double(microSpent) /1000000;
     ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;
     ResSMDValues["SMDpower"] = meterWattage;
@@ -264,7 +268,7 @@ void setup() {
     WiFi.mode(WIFI_AP);
     Serial.println("Configuring access point...");
     WiFi.softAP(APSSID);                     //Запуск AccessPoint с указанными учетными данными
-  IPAddress myIP = WiFi.softAPIP();        //IP-адрес нашей точки доступа Esp8266 (где мы можем размещать веб-страницы и просматривать данные)
+  IPAddress myIP = WiFi.softAPIP();          //IP-адрес нашей точки доступа Esp8266 (где мы можем размещать веб-страницы и просматривать данные)
     Serial.print("Access Point Name: "); 
     Serial.println(APSSID);
     Serial.print("Access Point IP address: ");
@@ -291,16 +295,31 @@ void loop() {
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
   }*/
+  delay(5);
   server.handleClient();
+  checkLedState();
+}
 
+void handleRoot() {
+ String html_index_h = webpage; //для обновления HTML/css/js в строку "webpage" в "index.h" запустите "front/htmlToH.exe"
+ server.send(200, "text/html", html_index_h);
+}
+
+void handle_NotFound() {
+    server.send(404, "text/plain", "Not found");
+}
+
+void checkLedState() {
   dataCur = analogRead(ANALOG_PIN);                   // запоминаем значение на сенсоре
   findAnalogWindow(dataCur);                          // расширяем окно, если значение выходит за его пределы
   ledStateOld = ledState;                             // сохраняем в буфер старое значение уровня сенсора
   checkLogic(dataCur);                                // оцениваем состояние сенсора и сохраняем его значение в ledState
 
   if (ledStateOld && !ledState) {                     // ИНДикатор только что загорелся
-    // вычисление длины последнего импульса   
+    Serial.print("led state has been changed, new blink period = ");
+    // вычисление длины последнего импульса
     microSpent = micros() - microTimer;               // длина последнего импульса = текущее время - время прошлого перехода
+    Serial.println(microSpent);
     microTimer = micros();                            // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса   
     blincsPerHour = 3600000000 / microSpent;          // сколько таких импульсов такой длины поместилось бы в часе
@@ -313,15 +332,6 @@ void loop() {
   }
 }
 
-void handleRoot() {
- String html_index_h = webpage; //для обновления HTML/css/js в строку "webpage" в "index.h" запустите "front/htmlToH.exe"
- server.send(200, "text/html", html_index_h);
-}
-
-void handle_NotFound() {
-    server.send(404, "text/plain", "Not found");
-}
-
 void initWindow() {
   unsigned long startTimer = millis() + 5000;
   Serial.print("initialization light window");
@@ -329,7 +339,7 @@ void initWindow() {
     dataCur = analogRead(ANALOG_PIN);
     findAnalogWindow(dataCur);
     delay(1000);
-    Serial.print(". ");
+    Serial.print(" . ");
   }
   Serial.println("initialization light window complited");
 }
@@ -349,8 +359,8 @@ void checkLogic(int analogData) {
 
 void closeAnalogWindow() {
   if (winLo < winHi - 30) {
-    int winDif = (winHi - winLo);                     // вычисляем ширину окна
-    winHi = winHi - (winDif / CLOSE_WIN_FACTOR);      // вычитаем 1/10 ширины из верхнего порога
-    winLo = winLo + (winDif / CLOSE_WIN_FACTOR);      // прибавляем 1/10 ширины к нижнему порогу
+    int winDif = (winHi - winLo);                // вычисляем ширину окна
+    winHi = winHi - (winDif / CLOSE_WIN_FACTOR); // вычитаем 1/10 ширины из верхнего порога
+    winLo = winLo + (winDif / CLOSE_WIN_FACTOR); // прибавляем 1/10 ширины к нижнему порогу
   }
 }
