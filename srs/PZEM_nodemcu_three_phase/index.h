@@ -251,31 +251,37 @@ function CheckCurrentTransformerTransformationRatioInputs() {    if (currentTran
 };let allValuesToCSV = [[    'time',    'timer',    'currentTransformerTransformationRatio',    'constMeterImpsNum',    'meterSerialNum',    'pzemVoltage1',    'pzemVoltage2',    'pzemVoltage3',    'pzemCurrent1',    'pzemCurrent2',    'pzemCurrent3',    'pzemPower1',    'pzemPower2',    'pzemPower3',    'pzemEnergy1',    'pzemEnergy2',    'pzemEnergy3',    'pzemFrequency1',    'pzemFrequency2',    'pzemFrequency3',    'pzemPowerFactor1',    'pzemPowerFactor2',    'pzemPowerFactor3',    'pzemFullCurrent',    'pzemFullPower',    'pzemFullEnergy',    'kyImpsMeter',    'impsPeriodMeter',    'calcMeterPower',
     'calcMeterAccuracy']];
 function ViewAllESPdata(ESPdata) {
-    pzemVoltageMeterCheck1.value = ESPdata.voltages[0];
-    pzemVoltageMeterCheck2.value = ESPdata.voltages[1];
-    pzemVoltageMeterCheck3.value = ESPdata.voltages[2];
-    pzemCurrentMeterCheck1.value = ESPdata.currents[0];
-    pzemCurrentMeterCheck2.value = ESPdata.currents[1];
-    pzemCurrentMeterCheck3.value = ESPdata.currents[2];
-    pzemPowerMeterCheck1.value = ESPdata.powers[0];
-    pzemPowerMeterCheck2.value = ESPdata.powers[1];
-    pzemPowerMeterCheck3.value = ESPdata.powers[2];
-    pzemEnergyMeterCheck1.value = ESPdata.energies[0];
-    pzemEnergyMeterCheck2.value = ESPdata.energies[1];
-    pzemEnergyMeterCheck3.value = ESPdata.energies[2];
-    pzemFrequencyMeterCheck1.value = ESPdata.frequencies[0];
-    pzemFrequencyMeterCheck2.value = ESPdata.frequencies[1];
-    pzemFrequencyMeterCheck3.value = ESPdata.frequencies[2];
-    pzemPowerFactorMeterCheck1.value =ESPdata.powerFactories[0];
-    pzemPowerFactorMeterCheck2.value =ESPdata.powerFactories[1];
-    pzemPowerFactorMeterCheck3.value =ESPdata.powerFactories[2];
-    pzemFullCurrentCheck.value = ESPdata.FullValues.current;
-    pzemFullPowerCheck.value = ESPdata.FullValues.power;
-    pzemFullEnergyMeterCheck.value = ESPdata.FullValues.energy;
+    if (ESPdata.voltages[0]) {
+        pzemVoltageMeterCheck1.value = ESPdata.voltages[0].toFixed(2);
+        pzemCurrentMeterCheck1.value = ESPdata.currents[0].toFixed(2);
+        pzemPowerMeterCheck1.value = ESPdata.powers[0].toFixed(2);
+        pzemEnergyMeterCheck1.value = ESPdata.energies[0].toFixed(2);
+        pzemFrequencyMeterCheck1.value = ESPdata.frequencies[0].toFixed(2);
+        pzemPowerFactorMeterCheck1.value =ESPdata.powerFactories[0].toFixed(2);
+    }
+    if (ESPdata.voltages[1]) {
+        pzemVoltageMeterCheck2.value = ESPdata.voltages[1].toFixed(2);
+        pzemCurrentMeterCheck2.value = ESPdata.currents[1].toFixed(2);
+        pzemPowerMeterCheck2.value = ESPdata.powers[1].toFixed(2);
+        pzemEnergyMeterCheck2.value = ESPdata.energies[1].toFixed(2);
+        pzemFrequencyMeterCheck2.value = ESPdata.frequencies[1].toFixed(2);
+        pzemPowerFactorMeterCheck2.value =ESPdata.powerFactories[1].toFixed(2);
+    }
+    if (ESPdata.voltages[2]) {
+        pzemVoltageMeterCheck3.value = ESPdata.voltages[2].toFixed(2);
+        pzemCurrentMeterCheck3.value = ESPdata.currents[2].toFixed(2);
+        pzemPowerMeterCheck3.value = ESPdata.powers[2].toFixed(2);
+        pzemEnergyMeterCheck3.value = ESPdata.energies[2].toFixed(2);
+        pzemFrequencyMeterCheck3.value = ESPdata.frequencies[2].toFixed(2);
+        pzemPowerFactorMeterCheck3.value =ESPdata.powerFactories[2].toFixed(2);
+    }
+    if (ESPdata.FullValues.current) pzemFullCurrentCheck.value = ESPdata.FullValues.current.toFixed(2);
+    if (ESPdata.FullValues.power) pzemFullPowerCheck.value = ESPdata.FullValues.power.toFixed(2);
+    if (ESPdata.FullValues.energy) pzemFullEnergyMeterCheck.value = ESPdata.FullValues.energy.toFixed(2);
     kyImpsMeterCheck.value = ESPdata.ResSMDValues.KYimpNumSumm;
-    impsPeriodMeterCheck.value = ESPdata.ResSMDValues.SMDimpPeriod;
-    calcMeterPower.value = ESPdata.ResSMDValues.SMDpower;
-    calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuraty;
+    if (ESPdata.ResSMDValues.SMDimpPeriod) impsPeriodMeterCheck.value = ESPdata.ResSMDValues.SMDimpPeriod.toFixed(2);
+    if (ESPdata.ResSMDValues.SMDpower) calcMeterPower.value = ESPdata.ResSMDValues.SMDpower.toFixed(2);
+    if (ESPdata.ResSMDValues.SMDAccuraty) calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuraty.toFixed(2);
     pushAllESPdataToCSVarray();
 }
 function formatDate(date) {    return date.getFullYear() + '/' +      (date.getMonth() + 1) + '/' +      date.getDate() + ' ' +      date.getHours() + ':' +      date.getMinutes() + ':' +

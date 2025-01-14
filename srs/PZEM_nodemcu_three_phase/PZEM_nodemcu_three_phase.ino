@@ -11,8 +11,8 @@
 #define APSSID "SmartGridComMeterESPap" // Имя точки доступа, которую создаст ESP
 #define STASSID "Redmi_DF75"            // Точка доступа (логин и пароль от wifi), к которой подключится ESP
 #define STAPSK "51194303" 
-#define STASSID2 "Admin"
-#define STAPSK2 "Admin" 
+//#define STASSID2 "Admin"
+//#define STAPSK2 "Admin" 
 #define ANALOG_PIN A0
 #define CLOSE_WIN_FACTOR 10             // 1/CLOSE_WIN_FACTOR для сужения окна с каждой стороны
 
@@ -22,8 +22,8 @@ ESP8266WebServer server(80);
 const char *ap_ssid = APSSID;
 const char* ssid = STASSID;
 const char* password = STAPSK;
-const char* ssid2 = STASSID2;
-const char* password2 = STAPSK2;
+//const char* ssid2 = STASSID2;
+//const char* password2 = STAPSK2;
 
 PZEM004Tv30 pzem1(D1, D2); // (RX,TX) подключиться к TX,RX PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) подключиться к TX,RX PZEM2
@@ -61,121 +61,117 @@ unsigned long microTimer, microSpent;          // Стоп-таймер в ми�
 boolean ledState, ledStateOld;                 // текущее логическое состояние фоторезистора
 float meterWattage = 0;                        // текущая мощность счётчика
 int constMeterImpsNum = 1000;                  // постояннная счётчика
-float blincsPerHour = 0;                       // кол-во импульсов в час
+float SMDAccuraty = 100;                       // Погрешность счётчика
 int WtTokWtScale = 1000;                       // коэффициент перевода Вт в кВт
 int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
 
 void SetPzem1Values() {
-  voltage1 = 0;
-  current1= 0;
-  power1= 0;
-  energy1= 0;
-  frequency1= 0;
-  pf1= 0;
+  voltage1 = 0;checkLedState();
+  current1= 0;checkLedState();
+  power1= 0;checkLedState();
+  energy1= 0;checkLedState();
+  frequency1= 0;checkLedState();
+  pf1= 0;checkLedState();
   if (!isnan(voltage1 = pzem1.voltage())) {
-    current1 = pzem1.current() * сurrentTransformerTransformationRatio;
-    current += current1;
-    frequency1 = pzem1.frequency();
-    pf1 = pzem1.pf();
-    power1 = pzem1.power() / WtTokWtScale * сurrentTransformerTransformationRatio;
-    power += power1;
-    energy1 = pzem1.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;
-    energy += energy1;
+    current1 = pzem1.current() * сurrentTransformerTransformationRatio;checkLedState();
+    current += current1;checkLedState();
+    frequency1 = pzem1.frequency();checkLedState();
+    pf1 = pzem1.pf();checkLedState();
+    power1 = pzem1.power() / WtTokWtScale * сurrentTransformerTransformationRatio;checkLedState();
+    power += power1;checkLedState();
+    energy1 = pzem1.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;checkLedState();
+    energy += energy1;checkLedState();
   }
 }
 
 void SetPzem2Values() {
-  voltage2 = 0;
-  current2= 0;
-  power2= 0;
-  energy2= 0;
-  frequency2= 0;
-  pf2= 0;
+  voltage2 = 0;checkLedState();
+  current2= 0;checkLedState();
+  power2= 0;checkLedState();
+  energy2= 0;checkLedState();
+  frequency2= 0;checkLedState();
+  pf2= 0;checkLedState();
   if (!isnan(voltage2 = pzem2.voltage())) {
-    current2 = pzem2.current() * сurrentTransformerTransformationRatio;
-    current += current2;
-    frequency2 = pzem2.frequency();
-    pf2 = pzem2.pf();
-    power2 = pzem2.power() / WtTokWtScale * сurrentTransformerTransformationRatio;
-    power += power2;
-    energy2 = pzem2.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;
-    energy += energy2;
+    current2 = pzem2.current() * сurrentTransformerTransformationRatio;checkLedState();
+    current += current2;checkLedState();
+    frequency2 = pzem2.frequency();checkLedState();
+    pf2 = pzem2.pf();checkLedState();
+    power2 = pzem2.power() / WtTokWtScale * сurrentTransformerTransformationRatio;checkLedState();
+    power += power2;checkLedState();
+    energy2 = pzem2.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;checkLedState();
+    energy += energy2;checkLedState();
   }
 }
 
 void SetPzem3Values() {
-  voltage3 =0;
-  current3= 0;
-  power3= 0;
-  energy3= 0;
-  frequency3= 0;
-  pf3= 0;
+  voltage3 =0;checkLedState();
+  current3= 0;checkLedState();
+  power3= 0;checkLedState();
+  energy3= 0;checkLedState();
+  frequency3= 0;checkLedState();
+  pf3= 0;checkLedState();
   if (!isnan(voltage3 = pzem3.voltage())) {
-    current3 = pzem3.current() * сurrentTransformerTransformationRatio;
-    current += current3;
-    frequency3 = pzem3.frequency();
-    pf3 = pzem3.pf();
-    power3 = pzem3.power() / WtTokWtScale * сurrentTransformerTransformationRatio;
-    power += power3;
-    energy3 = pzem3.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;
-    energy += energy3;
+    current3 = pzem3.current() * сurrentTransformerTransformationRatio;checkLedState();
+    current += current3;checkLedState();
+    frequency3 = pzem3.frequency();checkLedState();
+    pf3 = pzem3.pf();checkLedState();
+    power3 = pzem3.power() / WtTokWtScale * сurrentTransformerTransformationRatio;checkLedState();
+    power += power3;checkLedState();
+    energy3 = pzem3.energy() / WtTokWtScale * сurrentTransformerTransformationRatio;checkLedState();
+    energy += energy3;checkLedState();
   }
 }
 
 void SendPzemsValues() {
-  current = 0;
-  power = 0;
-  energy = 0;
-  checkLedState(); // костыльно решаем проблему многозадачности
-  SetPzem1Values();
-  checkLedState();
-  SetPzem2Values();
-  checkLedState();
-  SetPzem3Values();
-  checkLedState();
-  //float SMDAccuraty = 1000;
-  /*if (power)*/ float SMDAccuraty = (power - meterWattage) / power * 100;
+  yield();checkLedState();// костыльно решаем проблему многозадачности
+  current = 0;checkLedState(); 
+  power = 0;checkLedState();
+  energy = 0;checkLedState();
+  SetPzem1Values();checkLedState();
+  SetPzem2Values();checkLedState();
+  SetPzem3Values();checkLedState();
 
   // отправляем ответ в формате json
-  JsonDocument doc; // создаём JSON документ
+  JsonDocument doc;checkLedState(); // создаём JSON документ
   // Добавить массивы в JSON документ
-  JsonArray data = doc["voltages"].to<JsonArray>();
-    data.add(voltage1);
-    data.add(voltage2);
-    data.add(voltage3);
-  data = doc["currents"].to<JsonArray>();
-    data.add(current1);
-    data.add(current2);
-    data.add(current3);
-  data = doc["powers"].to<JsonArray>();
-    data.add(power1);
-    data.add(power2);
-    data.add(power3);
-  data = doc["energies"].to<JsonArray>();
-    data.add(energy1);
-    data.add(energy2);
-    data.add(energy3);
-  data = doc["frequencies"].to<JsonArray>();
-    data.add(frequency1);
-    data.add(frequency2);
-    data.add(frequency3);
-  data = doc["powerFactories"].to<JsonArray>();
-    data.add(pf1);
-    data.add(pf2);
-    data.add(pf3);
+  JsonArray data = doc["voltages"].to<JsonArray>();checkLedState();
+    data.add(voltage1);checkLedState();
+    data.add(voltage2);checkLedState();
+    data.add(voltage3);checkLedState();
+  data = doc["currents"].to<JsonArray>();checkLedState();
+    data.add(current1);checkLedState();
+    data.add(current2);checkLedState();
+    data.add(current3);checkLedState();
+  data = doc["powers"].to<JsonArray>();checkLedState();
+    data.add(power1);checkLedState();
+    data.add(power2);checkLedState();
+    data.add(power3);checkLedState();
+  data = doc["energies"].to<JsonArray>();checkLedState();
+    data.add(energy1);checkLedState();
+    data.add(energy2);checkLedState();
+    data.add(energy3);checkLedState();
+  data = doc["frequencies"].to<JsonArray>();checkLedState();
+    data.add(frequency1);checkLedState();
+    data.add(frequency2);checkLedState();
+    data.add(frequency3);checkLedState();
+  data = doc["powerFactories"].to<JsonArray>();checkLedState();
+    data.add(pf1);checkLedState();
+    data.add(pf2);checkLedState();
+    data.add(pf3);checkLedState();
   // Добавить объекты в JSON документ
-  JsonObject FullValues =  doc["FullValues"].to<JsonObject>();
-    FullValues["current"] = current;
-    FullValues["power"] = power;
-    FullValues["energy"] = energy;
-  JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();
-  checkLedState();
-    ResSMDValues["SMDimpPeriod"] = double(microSpent) /1000000;
-    ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;
-    ResSMDValues["SMDpower"] = meterWattage;
-    ResSMDValues["SMDAccuraty"] = SMDAccuraty;
-
-  server.send(200, "application/json", doc.as<String>());
+  JsonObject FullValues =  doc["FullValues"].to<JsonObject>();checkLedState();
+    FullValues["current"] = current;checkLedState();
+    FullValues["power"] = power;checkLedState();
+    FullValues["energy"] = energy;checkLedState();
+  JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();checkLedState();
+    ResSMDValues["SMDimpPeriod"] = double(microSpent) /1000000;checkLedState();
+    ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;checkLedState();
+    meterWattage = 3600000000 / microSpent / constMeterImpsNum;checkLedState(); // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
+    ResSMDValues["SMDpower"] = meterWattage;checkLedState();
+    if (power) SMDAccuraty = (power - meterWattage) / power * 100;checkLedState();
+    ResSMDValues["SMDAccuraty"] = SMDAccuraty;checkLedState();
+  server.send(200, "application/json", doc.as<String>());checkLedState();
+  yield();checkLedState();
 }
 
 void SetConstMeterImpsNum() {
@@ -196,7 +192,6 @@ void Reset() {
   meterWattage = 0;
   constMeterImpsNum = 1000; 
   сurrentTransformerTransformationRatio = 1;
-  blincsPerHour = 0;
   if (pzem1.resetEnergy() &&
       pzem2.resetEnergy() &&
       pzem3.resetEnergy()) {
@@ -247,12 +242,15 @@ void setup() {
   /*раздел подключения к Wi-Fi*/
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP(ssid, password);
-  wifiMulti.addAP(ssid2, password2);
+  //wifiMulti.addAP(ssid2, password2);
   Serial.println("");
   Serial.print("Connecting");
   // Ожидаем подключения
   unsigned long connectionTimer = millis() + 5000;
   while (millis() < connectionTimer && wifiMulti.run() != WL_CONNECTED) { 
+    if (wifiMulti.run() != WL_CONNECTED) {
+      break;
+    }
     delay(500);
     Serial.print(".");
   }
@@ -267,10 +265,10 @@ void setup() {
     // раздел добавления точки доступа wifi
     WiFi.mode(WIFI_AP);
     Serial.println("Configuring access point...");
-    WiFi.softAP(APSSID);                     //Запуск AccessPoint с указанными учетными данными
-  IPAddress myIP = WiFi.softAPIP();          //IP-адрес нашей точки доступа Esp8266 (где мы можем размещать веб-страницы и просматривать данные)
+    WiFi.softAP(ap_ssid);                     //Запуск AccessPoint с указанными учетными данными
     Serial.print("Access Point Name: "); 
-    Serial.println(APSSID);
+    Serial.println(ap_ssid);
+    IPAddress myIP = WiFi.softAPIP();          //IP-адрес нашей точки доступа Esp8266 (где мы можем размещать веб-страницы и просматривать данные)
     Serial.print("Access Point IP address: ");
     Serial.println(myIP); // http://192.168.4.1/
     Serial.println("");
@@ -295,8 +293,8 @@ void loop() {
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
   }*/
-  delay(5);
   server.handleClient();
+  delay(10);
   checkLedState();
 }
 
@@ -316,17 +314,14 @@ void checkLedState() {
   checkLogic(dataCur);                                // оцениваем состояние сенсора и сохраняем его значение в ledState
 
   if (ledStateOld && !ledState) {                     // ИНДикатор только что загорелся
-    Serial.print("led state has been changed, new blink period = ");
+    //Serial.print("led state has been changed, new blink period = ");
     // вычисление длины последнего импульса
     microSpent = micros() - microTimer;               // длина последнего импульса = текущее время - время прошлого перехода
-    Serial.println(microSpent);
+    //Serial.println(double(microSpent) /1000000);
     microTimer = micros();                            // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса   
-    blincsPerHour = 3600000000 / microSpent;          // сколько таких импульсов такой длины поместилось бы в часе
     KYimpNumSumm++;
-    meterWattage = blincsPerHour / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
   }
-
   if (!ledStateOld && ledState) { // ИНДикатор только что погас
     closeAnalogWindow();          // ужимаем пороги окна сенсора, чтобы они хронически не росли.
   }
