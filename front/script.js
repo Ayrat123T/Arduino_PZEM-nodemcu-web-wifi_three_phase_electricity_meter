@@ -1,6 +1,7 @@
 let currentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
 let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
 let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
+let queueSizeCalcMeterAccuracyCheck = document.getElementById('QueueSizeCalcMeterAccuracyCheck');
 
 let pzemVoltageMeterCheck1 = document.getElementById('PzemVoltageMeterCheck1');
 let pzemVoltageMeterCheck2 = document.getElementById('PzemVoltageMeterCheck2');
@@ -67,6 +68,15 @@ function CheckCurrentTransformerTransformationRatioInputs() {
         }
     return true;
 };
+
+function CheckQueueSizeCalcMeterAccuracyCheck() {
+    if (queueSizeCalcMeterAccuracyCheck.value == ''
+        || queueSizeCalcMeterAccuracyCheck.value <= 0) {
+            alert('Кол-во импульсов должно быть больше 0');
+            return false;
+        }
+    return true;
+}
 
 let allValuesToCSV = [[
     'time',
@@ -235,6 +245,27 @@ function sendCurrentTransformerTransformationRatio() {
         xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
+        }
+        };
+        xhttp.onload = function () {
+            ViewAllESPdata(xhttp.response);
+        };
+    }
+};
+
+queueSizeCalcMeterAccuracyCheck.addEventListener("change", sendQueueSizeCalcMeterAccuracyCheck);
+
+function sendQueueSizeCalcMeterAccuracyCheck() {
+    if (CheckQueueSizeCalcMeterAccuracyCheck()) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET",
+            "queue_size_calc_meter_accuracy_check?queueSizeCalcMeterAccuracyCheck="+queueSizeCalcMeterAccuracyCheck.value,
+            true);
+        xhttp.responseType = "json";
+        xhttp.send();
+        xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log("sendQueueSizeCalcMeterAccuracyCheck successful✔️\n\r");
         }
         };
         xhttp.onload = function () {

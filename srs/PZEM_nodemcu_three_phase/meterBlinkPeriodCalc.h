@@ -1,33 +1,52 @@
 #pragma once
-#include <queue>
+#include <execution>
+#include <algorithm>
+#include <cmath>
 #include "values.h"
 
-int KYimpNumSumm = 0;                          // текущее кол-во импульсов
-int winHi = 0, winLo = 1024;                   // пределы гистерезиса
-int dataCur;                                   // временное хранение текущих данных фоторезистора
-unsigned long microTimer;                      // Стоп-таймер в микросекундах
-double meterBlinkPeriod;                       // Период моргания счётчика
-std::queue<double> meterBlinkPeriods;          // Очередь из последних периодов моргания счётчика                         
-boolean ledState, ledStateOld;                 // текущее логическое состояние фоторезистора
-float meterWattage = 0;                        // текущая мощность счётчика
-
 void checkLedState();
+void initWindow();
 void findAnalogWindow(int analogData);
 void checkLogic(int analogData);
 void closeAnalogWindow();
-void initWindow();
+
+// возвращает среднее арифметическое
+template <typename ExecutionPolicy, typename IteratorRange>
+double GetArithmeticMean(ExecutionPolicy&& Policy, IteratorRange begin, IteratorRange end) {
+    double res = std::reduce(Policy, begin, end);
+    int sum = (end - begin);
+    return res / sum;
+}
+
+// возвращает стандартное отклонение
+template <typename ExecutionPolicy, typename IteratorRange>
+double GetStandardDeviation(ExecutionPolicy&& Policy, IteratorRange begin, IteratorRange end) {
+    double arithmetic_mean = GetArithmeticMean(Policy, begin, end);
+    return std::sqrt(std::transform_reduce(Policy, begin, end, 0.0, std::plus{}, [&arithmetic_mean](const auto delt) { // среднеквадратичное отклонение
+        return pow(arithmetic_mean - delt, 2);
+        }) / (end - begin - 1));
+}
 
 void checkLedState() {
   yield();
-  dataCur = analogRead(ANALOG_PIN);                   // запоминаем значение на сенсоре
-  findAnalogWindow(dataCur);                          // расширяем окно, если значение выходит за его пределы
-  ledStateOld = ledState;                             // сохраняем в буфер старое значение уровня сенсора
-  checkLogic(dataCur);                                // оцениваем состояние сенсора и сохраняем его значение в ledState
+  dataCur = analogRead(ANALOG_PIN);// запоминаем значение на сенсоре
+  findAnalogWindow(dataCur);       // расширяем окно, если значение выходит за его пределы
+  ledStateOld = ledState;          // сохраняем в буфер старое значение уровня сенсора
+  checkLogic(dataCur);             // оцениваем состояние сенсора и сохраняем его значение в ledState
 
-  if (ledStateOld && !ledState) {                     // ИНДикатор только что загорелся
+  if (ledStateOld && !ledState) {  // ИНДикатор только что загорелся
     Serial.print("led state has been changed, new blink period = ");
     // вычисление длины последнего импульса
     meterBlinkPeriod = double(micros() - microTimer) / 1000000;               // длина последнего импульса = текущее время - время прошлого перехода
+    if (queueSize > 1) { 
+        meterBlinkPeriods.push(meterBlinkPeriod); // добавляем период моргания в очередь, если пользователь задал её длину > 1
+        if (meterBlinkPeriods > queueSize) { 
+            queueSum -= meterBlinkPeriods.front() // корректрируем сумму очереди
+            meterBlinkPeriods.pop(); // удаляем первый элемент, если очередь переполнена
+        }
+        queueSum += meterBlinkPeriod;
+        meterBlinkPeriod = queueSum / meterBlinkPeriods.size();
+    }
     Serial.println(meterBlinkPeriod);
     microTimer = micros();                            // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса   

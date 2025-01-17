@@ -83,6 +83,12 @@ void SetСurrentTransformerTransformationRatio() {
   SendPzemsValues();
 }
 
+void SetQueueSizeCalcMeterAccuracyCheck() {
+  String queueSizeCalcMeterAccuracyCheckStr = server.arg("queueSizeCalcMeterAccuracyCheck");
+  queueSize = queueSizeCalcMeterAccuracyCheckStr.toInt();
+  SendPzemsValues();
+}
+
 void Reset() {
   KYimpNumSumm = 0;
   winHi = 0, winLo = 1024;
@@ -176,6 +182,7 @@ void setup() {
 	server.on("/", handleRoot);
   server.on("/current_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
+  server.on("/queue_size_calc_meter_accuracy_check", SetQueueSizeCalcMeterAccuracyCheck);
   server.on("/pzem_values", SendPzemsValues);
   server.on("/reset", Reset);
 	server.onNotFound(handle_NotFound);

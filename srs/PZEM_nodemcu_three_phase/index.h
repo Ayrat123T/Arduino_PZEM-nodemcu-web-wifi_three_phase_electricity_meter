@@ -130,52 +130,54 @@ input[type="checkbox"] {
                         <option value="10000"></option>
                     </datalist>
                 <table class="input"><tr><td>
-                    <input id="SMDSerialNumMeterCheck" class="inputErr" name="SMDSerialNumMeterCheck" placeholder="Номер ИПУ"/>
-                </td></tr></table></p>
+                    <input id="SMDSerialNumMeterCheck" class="inputErr" name="SMDSerialNumMeterCheck" placeholder="Номер ИПУ" title="будет сохранён в csv"/>
+                </td></tr></table>
+                <table class="input"><tr><td><label id="QueueSizeCalcMeterAccuracyLabel" class="input">Кол-во импульсов = </label>
+                    <input id="QueueSizeCalcMeterAccuracyCheck" type="number" class="input" name="QueueSizeCalcMeterAccuracyCheck" title="Кол-во последовательных импульсов, котрые будут учитываться при расчёте погрешности" value="1" min = "0" required/></td></tr></table>
+            </p>
             <p><table class="input"><tr>
                     <td><label id="PzemVoltageMeterLabel" class="labelMeterCheck">U[В] = </label></td>
-                    <td><input id="PzemVoltageMeterCheck1" class="inputMeterCheck" name="PzemVoltageMeterCheck1" required readonly/></td>
-                    <td><input id="PzemVoltageMeterCheck2" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck2" required readonly/></td>
-                    <td><input id="PzemVoltageMeterCheck3" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck3" required readonly/></td>
+                    <td><input id="PzemVoltageMeterCheck1" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck1" required readonly title="напряжение фазы А"/></td>
+                    <td><input id="PzemVoltageMeterCheck2" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck2" required readonly title="напряжение фазы B"/></td>
+                    <td><input id="PzemVoltageMeterCheck3" type="number" class="inputMeterCheck" name="PzemVoltageMeterCheck3" required readonly title="напряжение фазы C"/></td>
                 </tr>
                 <tr>
                     <td><label id="PzemCurrentMeterLabel" class="labelMeterCheck">I[А] = </label></td>
-                    <td><input id="PzemCurrentMeterCheck1" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck1" required readonly/></td>
-                    <td><input id="PzemCurrentMeterCheck2" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck2" required readonly/></td>
-                    <td><input id="PzemCurrentMeterCheck3" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck3" required readonly/></td>
+                    <td><input id="PzemCurrentMeterCheck1" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck1" required readonly title="ток фазы А"/></td>
+                    <td><input id="PzemCurrentMeterCheck2" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck2" required readonly title="ток фазы B"/></td>
+                    <td><input id="PzemCurrentMeterCheck3" type="number" class="inputMeterCheck" name="PzemCurrentMeterCheck3" required readonly title="ток фазы C"/></td>
                 </tr>
                 <tr>
                     <td><label id="PzemPowerMeterLabel" class="labelMeterCheck">P[кВт] = </label></td>
-                    <td><input id="PzemPowerMeterCheck1" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck1" required readonly/></td>
-                    <td><input id="PzemPowerMeterCheck2" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck2" required readonly/></td>
-                    <td><input id="PzemPowerMeterCheck3" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck3" required readonly/></td>
+                    <td><input id="PzemPowerMeterCheck1" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck1" required readonly title="мощность фазы А"/></td>
+                    <td><input id="PzemPowerMeterCheck2" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck2" required readonly title="мощность фазы B"/></td>
+                    <td><input id="PzemPowerMeterCheck3" type="number" class="inputMeterCheck" name="PzemPowerMeterCheck3" required readonly title="мощность фазы C"/></td>
                 </tr>
                 <tr>
                     <td><label id="PzemEnergyMeterLabel" class="labelMeterCheck">W[кВт*ч] = </label></td>
-                    <td><input id="PzemEnergyMeterCheck1" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck1" required readonly/></td>
-                    <td><input id="PzemEnergyMeterCheck2" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck2" required readonly/></td>
-                    <td><input id="PzemEnergyMeterCheck3" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck3" required readonly/></td>
+                    <td><input id="PzemEnergyMeterCheck1" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck1" required readonly title="Энергия фазы А"/></td>
+                    <td><input id="PzemEnergyMeterCheck2" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck2" required readonly title="Энергия фазы B"/></td>
+                    <td><input id="PzemEnergyMeterCheck3" type="number" class="inputMeterCheck" name="PzemEnergyMeterCheck3" required readonly title="Энергия фазы C"/></td>
                 </tr>
                 <tr>
                     <td><label id="PzemFrequencyMeterLabel" class="labelMeterCheck">f[Гц] = </label></td>
-                    <td><input id="PzemFrequencyMeterCheck1" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck1" required readonly/></td>
-                    <td><input id="PzemFrequencyMeterCheck2" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck2" required readonly/></td>
-                    <td><input id="PzemFrequencyMeterCheck3" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck3" required readonly/></td>
+                    <td><input id="PzemFrequencyMeterCheck1" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck1" required readonly title="частота фазы А"/></td>
+                    <td><input id="PzemFrequencyMeterCheck2" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck2" required readonly title="частота фазы B"/></td>
+                    <td><input id="PzemFrequencyMeterCheck3" type="number" class="inputMeterCheck" name="PzemFrequencyMeterCheck3" required readonly title="частота фазы C"/></td>
                 </tr>
                 <tr>
                     <td><label id="PzemPowerFactorMeterLabel" class="labelMeterCheck">cos(ф) = </label></td>
-                    <td><input id="PzemPowerFactorMeterCheck1" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck1" required readonly/></td>
-                    <td><input id="PzemPowerFactorMeterCheck2" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck2" required readonly/></td>
-                    <td><input id="PzemPowerFactorMeterCheck3" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck3" required readonly/></td>
-                </tr>
+                    <td><input id="PzemPowerFactorMeterCheck1" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck1" required readonly title="коэффициент мощности фазы А"/></td>
+                    <td><input id="PzemPowerFactorMeterCheck2" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck2" required readonly title="коэффициент мощности фазы B"/></td>
+                    <td><input id="PzemPowerFactorMeterCheck3" type="number" class="inputMeterCheck" name="PzemPowerFactorMeterCheck3" required readonly title="коэффициент мощности фазы C"/></td>                </tr> 
             </table></p>
             <p class="input">
                 <table class="input"><tr><td><label for ="PzemFullCurrentCheck"  id="PzemFullCurrentMeterLabel" class="labelMeterCheck">Iсум[А] = </label>
-                    <input id="PzemFullCurrentCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly/></td></tr></table>
+                    <input id="PzemFullCurrentCheck" type="number" class="inputMeterCheck" name="PzemFullCurrentCheck" required readonly title="суммарный ток"/></td></tr></table>
                 <table class="input"><tr><td><label for ="PzemFullPowerCheck" id="PzemFullPowerMeterLabel" class="labelMeterCheck">Pсум[кВт] = </label>
-                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullPowerCheck" required readonly/></td></tr></table>
+                    <input id="PzemFullPowerCheck" type="number" class="inputMeterCheck" name="PzemFullPowerCheck" required readonly title="суммарная мощность"/></td></tr></table>
                 <table class="input"><tr><td><label for ="PzemFullEnergyMeterCheck" id="PzemFullEnergyMeterLabel" class="labelMeterCheck">Wсум[кВт*ч] = </label>
-                    <input id="PzemFullEnergyMeterCheck" type="number" class="inputMeterCheck" name="PzemFullEnergyMeterCheck" required readonly/></td></tr></table>
+                    <input id="PzemFullEnergyMeterCheck" type="number" class="inputMeterCheck" name="PzemFullEnergyMeterCheck" required readonly title="суммарная энергия"/></td></tr></table>
              </p>
             <p><table class="input"><tr><td><label id="KYImpsMeterLabel" class="labelMeterCheck">n[имп] = </label>
                     <input id="KYImpsMeterCheck" type="number" class="inputMeterCheck" name="KYImpsMeterCheck"  title="кол-во импульсов" required readonly/></td></tr></table>
@@ -201,6 +203,7 @@ input[type="checkbox"] {
 let currentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
 let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
 let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
+let queueSizeCalcMeterAccuracyCheck = document.getElementById('QueueSizeCalcMeterAccuracyCheck');
 let pzemVoltageMeterCheck1 = document.getElementById('PzemVoltageMeterCheck1');
 let pzemVoltageMeterCheck2 = document.getElementById('PzemVoltageMeterCheck2');
 let pzemVoltageMeterCheck3 = document.getElementById('PzemVoltageMeterCheck3');
@@ -248,7 +251,14 @@ function CheckCurrentTransformerTransformationRatioInputs() {    if (currentTran
             return false;
         }
     return true;
-};let allValuesToCSV = [[    'time',    'timer',    'currentTransformerTransformationRatio',    'constMeterImpsNum',    'meterSerialNum',    'pzemVoltage1',    'pzemVoltage2',    'pzemVoltage3',    'pzemCurrent1',    'pzemCurrent2',    'pzemCurrent3',    'pzemPower1',    'pzemPower2',    'pzemPower3',    'pzemEnergy1',    'pzemEnergy2',    'pzemEnergy3',    'pzemFrequency1',    'pzemFrequency2',    'pzemFrequency3',    'pzemPowerFactor1',    'pzemPowerFactor2',    'pzemPowerFactor3',    'pzemFullCurrent',    'pzemFullPower',    'pzemFullEnergy',    'kyImpsMeter',    'impsPeriodMeter',    'calcMeterPower',
+};
+function CheckQueueSizeCalcMeterAccuracyCheck() {    if (queueSizeCalcMeterAccuracyCheck.value == ''
+        || queueSizeCalcMeterAccuracyCheck.value <= 0) {
+            alert('Кол-во импульсов должно быть больше 0');
+            return false;
+        }
+    return true;
+}let allValuesToCSV = [[    'time',    'timer',    'currentTransformerTransformationRatio',    'constMeterImpsNum',    'meterSerialNum',    'pzemVoltage1',    'pzemVoltage2',    'pzemVoltage3',    'pzemCurrent1',    'pzemCurrent2',    'pzemCurrent3',    'pzemPower1',    'pzemPower2',    'pzemPower3',    'pzemEnergy1',    'pzemEnergy2',    'pzemEnergy3',    'pzemFrequency1',    'pzemFrequency2',    'pzemFrequency3',    'pzemPowerFactor1',    'pzemPowerFactor2',    'pzemPowerFactor3',    'pzemFullCurrent',    'pzemFullPower',    'pzemFullEnergy',    'kyImpsMeter',    'impsPeriodMeter',    'calcMeterPower',
     'calcMeterAccuracy']];
 function ViewAllESPdata(ESPdata) {
     if (ESPdata.voltages[0]) {
@@ -334,6 +344,23 @@ function sendCurrentTransformerTransformationRatio() {
         xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
+        }
+        };
+        xhttp.onload = function () {
+            ViewAllESPdata(xhttp.response);
+        };
+    }
+};
+queueSizeCalcMeterAccuracyCheck.addEventListener("change", sendQueueSizeCalcMeterAccuracyCheck);
+function sendQueueSizeCalcMeterAccuracyCheck() {
+    if (CheckQueueSizeCalcMeterAccuracyCheck()) {
+        var xhttp = new XMLHttpRequest();        xhttp.open("GET",            "queue_size_calc_meter_accuracy_check?queueSizeCalcMeterAccuracyCheck="+queueSizeCalcMeterAccuracyCheck.value,
+            true);
+        xhttp.responseType = "json";
+        xhttp.send();
+        xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log("sendQueueSizeCalcMeterAccuracyCheck successful✔️\n\r");
         }
         };
         xhttp.onload = function () {
