@@ -61,11 +61,9 @@ void SendPzemsValues() {
     FullValues["power"] = power;checkLedState();
     FullValues["energy"] = energy;checkLedState();
   JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();checkLedState();
-    ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;
-    ResSMDValues["SMDimpPeriod"] = meterBlinkPeriod;
-    meterWattage = 3600 / meterBlinkPeriod  / constMeterImpsNum;checkLedState(); // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
+    ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;checkLedState();
+    ResSMDValues["SMDimpPeriod"] = meterBlinkPeriod;checkLedState();
     ResSMDValues["SMDpower"] = meterWattage;checkLedState();
-    if (power) SMDAccuraty = (power - meterWattage) / power * 100;checkLedState();
     ResSMDValues["SMDAccuraty"] = SMDAccuraty;checkLedState();
   server.send(200, "application/json", doc.as<String>());checkLedState();
   yield();checkLedState();

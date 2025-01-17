@@ -47,6 +47,8 @@ void checkLedState() {
         queueSum += meterBlinkPeriod;
         meterBlinkPeriod = queueSum / meterBlinkPeriods.size();
     }
+    meterWattage = 3600 / meterBlinkPeriod  / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
+    if (power) SMDAccuraty = (power - meterWattage) / power * 100;
     Serial.println(meterBlinkPeriod);
     microTimer = micros();                            // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса   
