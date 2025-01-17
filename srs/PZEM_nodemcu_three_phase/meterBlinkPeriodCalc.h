@@ -40,8 +40,8 @@ void checkLedState() {
     meterBlinkPeriod = double(micros() - microTimer) / 1000000;               // длина последнего импульса = текущее время - время прошлого перехода
     if (queueSize > 1) { 
         meterBlinkPeriods.push(meterBlinkPeriod); // добавляем период моргания в очередь, если пользователь задал её длину > 1
-        if (meterBlinkPeriods > queueSize) { 
-            queueSum -= meterBlinkPeriods.front() // корректрируем сумму очереди
+        if (meterBlinkPeriods.size() > queueSize) { 
+            queueSum -= meterBlinkPeriods.front(); // корректрируем сумму очереди
             meterBlinkPeriods.pop(); // удаляем первый элемент, если очередь переполнена
         }
         queueSum += meterBlinkPeriod;
