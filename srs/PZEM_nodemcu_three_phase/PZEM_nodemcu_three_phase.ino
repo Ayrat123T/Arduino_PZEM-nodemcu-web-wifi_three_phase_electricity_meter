@@ -21,8 +21,8 @@ const char* password = STAPSK;
 
 void SendPzemsValues() {
   yield();checkLedState();// костыльно решаем проблему многозадачности
-  current = 0;checkLedState(); 
-  power = 0;checkLedState();
+  current = 0;checkLedState();
+  power = 0;
   energy = 0;checkLedState();
   SetPzem1Values();checkLedState();
   SetPzem2Values();checkLedState();
@@ -63,8 +63,23 @@ void SendPzemsValues() {
   JsonObject ResSMDValues =  doc["ResSMDValues"].to<JsonObject>();checkLedState();
     ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;checkLedState();
     ResSMDValues["SMDimpPeriod"] = meterBlinkPeriod;checkLedState();
-    ResSMDValues["SMDpower"] = meterWattage;checkLedState();
-    ResSMDValues["SMDAccuracy"] = SMDAccuracy;checkLedState();
+    if (printSMDAccuracy) {
+      ResSMDValues["SMDpower"] = meterWattage;checkLedState();
+      if (power && meterWattage) {
+        ResSMDValues["SMDAccuracy"] = (power - meterWattage) / power * 100;checkLedState();
+      }
+      printSMDAccuracy = false;
+    }
+    //if (!printSMDAccuracy) meterWattage = NULL;
+    //ResSMDValues["SMDpower"] = meterWattage;checkLedState();
+    /*if (power && meterWattage && printSMDAccuracy) {
+      ResSMDValues["SMDAccuracy"] = (power - meterWattage) / power * 100;checkLedState();
+    } /*{
+      SMDAccuracy = (power - meterWattage) / power * 100;
+    } else {
+      SMDAccuracy = nullptr;
+    }*/
+    //ResSMDValues["SMDAccuracy"] = SMDAccuracy;checkLedState();
   server.send(200, "application/json", doc.as<String>());checkLedState();
   yield();checkLedState();
 }
@@ -82,16 +97,15 @@ void SetCurrentTransformerTransformationRatio() {
 }
 
 void SetQueueSizeCalcMeterAccuracyCheck() {
+  queueSum = 0;
+  printSMDAccuracy = false;
   String queueSizeCalcMeterAccuracyCheckStr = server.arg("queueSizeCalcMeterAccuracyCheck");
   queueSize = queueSizeCalcMeterAccuracyCheckStr.toInt();
   SendPzemsValues();
 }
 
 void Reset() {
-  KYimpNumSumm = 0;
-  winHi = 0, winLo = 1024;
-  meterWattage = 0;
-  constMeterImpsNum = 1000; 
+  resetCurrentValues();
   currentTransformerTransformationRatio = 1;
   if (pzem1.resetEnergy() &&
       pzem2.resetEnergy() &&

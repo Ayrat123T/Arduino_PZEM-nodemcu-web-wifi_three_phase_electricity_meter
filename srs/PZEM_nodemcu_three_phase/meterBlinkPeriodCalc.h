@@ -18,17 +18,23 @@ void checkLedState() {
     Serial.print("led state has been changed, new blink period = ");
     // вычисление длины последнего импульса
     meterBlinkPeriod = double(micros() - microTimer) / 1000000;               // длина последнего импульса = текущее время - время прошлого перехода
-    if (queueSize > 1) { 
+    if (queueSize > 1) {
+        printSMDAccuracy = false;
         meterBlinkPeriods.push(meterBlinkPeriod); // добавляем период моргания в очередь, если пользователь задал её длину > 1
-        if (meterBlinkPeriods.size() > queueSize) { 
-            queueSum -= meterBlinkPeriods.front(); // корректрируем сумму очереди
-            meterBlinkPeriods.pop(); // удаляем первый элемент, если очередь переполнена
-        }
         queueSum += meterBlinkPeriod;
-        meterBlinkPeriod = queueSum / meterBlinkPeriods.size();
+        if (meterBlinkPeriods.size() == queueSize) { 
+            /*queueSum -= meterAccuracy.front(); // корректируем сумму очереди
+            meterAccuracy.pop(); // удаляем первый элемент, если очередь переполнена*/
+            meterBlinkPeriod = queueSum / meterBlinkPeriods.size();
+            while (!meterBlinkPeriods.empty()) meterBlinkPeriods.pop();
+            queueSum = 0;
+            meterWattage = 3600 / meterBlinkPeriod  / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
+            printSMDAccuracy = true;
+        }
+    } else {
+      printSMDAccuracy = true;
+      meterWattage = 3600 / meterBlinkPeriod  / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
     }
-    meterWattage = 3600 / meterBlinkPeriod  / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
-    if (power) SMDAccuracy = (power - meterWattage) / power * 100;
     Serial.println(meterBlinkPeriod);
     microTimer = micros();                            // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса   

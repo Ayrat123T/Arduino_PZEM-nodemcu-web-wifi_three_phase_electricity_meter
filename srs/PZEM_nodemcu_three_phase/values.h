@@ -40,7 +40,7 @@ PZEM004Tv30 pzem3(D7, D0); // (RX,TX) подключиться к TX,RX PZEM3
   float pf3= 0;
 
 int constMeterImpsNum = 1000;                  // постоянная счётчика
-float SMDAccuracy = 100;                       // Погрешность счётчика
+float SMDAccuracy;                             // Погрешность счётчика
 int WtTokWtScale = 1000;                       // коэффициент перевода Вт в кВт
 int currentTransformerTransformationRatio = 1; // коэффициент трансформации трансформатора тока
 
@@ -49,8 +49,24 @@ int winHi = 0, winLo = 1024;                   // пределы гистере�
 int dataCur;                                   // временное хранение текущих данных фоторезистора
 unsigned long microTimer;                      // Стоп-таймер в микросекундах
 double meterBlinkPeriod;                       // Период моргания счётчика
-std::queue<double> meterBlinkPeriods;          // Очередь из последних периодов моргания счётчика    
-size_t queueSize = 1;                     
+std::queue<double> meterBlinkPeriods;              // Очередь из последних периодов моргания счётчика    
+size_t queueSize = 1;
 double queueSum = 0; 
 boolean ledState, ledStateOld;                 // текущее логическое состояние фоторезистора
 float meterWattage = 0;                        // текущая мощность счётчика
+boolean printSMDAccuracy = false;
+
+void resetCurrentValues() {
+  yield();
+  current = 0;
+  power = 0;
+  energy = 0;
+  queueSum = 0;
+  while (!meterBlinkPeriods.empty()) meterBlinkPeriods.pop();
+  queueSize = 1;
+  KYimpNumSumm = 0;
+  winHi = 0, winLo = 1024;
+  meterWattage = 0;
+  constMeterImpsNum = 1000;
+  yield();
+}

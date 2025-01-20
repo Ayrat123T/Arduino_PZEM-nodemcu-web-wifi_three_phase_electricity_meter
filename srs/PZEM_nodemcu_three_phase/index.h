@@ -129,11 +129,11 @@ input[type="checkbox"] {
                         <option value="5000"></option>
                         <option value="10000"></option>
                     </datalist>
+                <table class="input"><tr><td><label id="QueueSizeCalcMeterAccuracyLabel" class="input">Кол-во импульсов = </label>
+                    <input id="QueueSizeCalcMeterAccuracyCheck" type="number" class="input" name="QueueSizeCalcMeterAccuracyCheck" title="Кол-во последовательных импульсов, которые будут учитываться при расчёте погрешности" value="1" min = "0" required/></td></tr></table>
                 <table class="input"><tr><td>
                     <input id="SMDSerialNumMeterCheck" class="inputErr" name="SMDSerialNumMeterCheck" placeholder="Номер ИПУ" title="будет сохранён в csv"/>
                 </td></tr></table>
-                <table class="input"><tr><td><label id="QueueSizeCalcMeterAccuracyLabel" class="input">Кол-во импульсов = </label>
-                    <input id="QueueSizeCalcMeterAccuracyCheck" type="number" class="input" name="QueueSizeCalcMeterAccuracyCheck" title="Кол-во последовательных импульсов, котрые будут учитываться при расчёте погрешности" value="1" min = "0" required/></td></tr></table>
             </p>
             <p><table class="input"><tr>
                     <td><label id="PzemVoltageMeterLabel" class="labelMeterCheck">U[В] = </label></td>
@@ -202,8 +202,8 @@ input[type="checkbox"] {
 <script>
 let currentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
 let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
-let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
 let queueSizeCalcMeterAccuracyCheck = document.getElementById('QueueSizeCalcMeterAccuracyCheck');
+let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
 let pzemVoltageMeterCheck1 = document.getElementById('PzemVoltageMeterCheck1');
 let pzemVoltageMeterCheck2 = document.getElementById('PzemVoltageMeterCheck2');
 let pzemVoltageMeterCheck3 = document.getElementById('PzemVoltageMeterCheck3');
@@ -254,11 +254,11 @@ function CheckCurrentTransformerTransformationRatioInputs() {    if (currentTran
 };
 function CheckQueueSizeCalcMeterAccuracyCheck() {    if (queueSizeCalcMeterAccuracyCheck.value == ''
         || queueSizeCalcMeterAccuracyCheck.value <= 0) {
-            alert('Кол-во импульсов должно быть больше 0');
+            alert('Кол-во последовательных импульсов, которые будут учитываться при расчёте погрешности, должно быть больше 0');
             return false;
         }
     return true;
-}let allValuesToCSV = [[    'time',    'timer',    'currentTransformerTransformationRatio',    'constMeterImpsNum',    'meterSerialNum',    'pzemVoltage1',    'pzemVoltage2',    'pzemVoltage3',    'pzemCurrent1',    'pzemCurrent2',    'pzemCurrent3',    'pzemPower1',    'pzemPower2',    'pzemPower3',    'pzemEnergy1',    'pzemEnergy2',    'pzemEnergy3',    'pzemFrequency1',    'pzemFrequency2',    'pzemFrequency3',    'pzemPowerFactor1',    'pzemPowerFactor2',    'pzemPowerFactor3',    'pzemFullCurrent',    'pzemFullPower',    'pzemFullEnergy',    'kyImpsMeter',    'impsPeriodMeter',    'calcMeterPower',
+}let allValuesToCSV = [[    'time',    'timer',    'currentTransformerTransformationRatio',    'constMeterImpsNum',    'queueSizeCalcMeterAccuracy',    'meterSerialNum',    'pzemVoltage1',    'pzemVoltage2',    'pzemVoltage3',    'pzemCurrent1',    'pzemCurrent2',    'pzemCurrent3',    'pzemPower1',    'pzemPower2',    'pzemPower3',    'pzemEnergy1',    'pzemEnergy2',    'pzemEnergy3',    'pzemFrequency1',    'pzemFrequency2',    'pzemFrequency3',    'pzemPowerFactor1',    'pzemPowerFactor2',    'pzemPowerFactor3',    'pzemFullCurrent',    'pzemFullPower',    'pzemFullEnergy',    'kyImpsMeter',    'impsPeriodMeter',    'calcMeterPower',
     'calcMeterAccuracy']];
 function ViewAllESPdata(ESPdata) {
     if (ESPdata.voltages[0]) {
@@ -291,7 +291,7 @@ function ViewAllESPdata(ESPdata) {
     kyImpsMeterCheck.value = ESPdata.ResSMDValues.KYimpNumSumm;
     if (ESPdata.ResSMDValues.SMDimpPeriod) impsPeriodMeterCheck.value = ESPdata.ResSMDValues.SMDimpPeriod.toFixed(2);
     if (ESPdata.ResSMDValues.SMDpower) calcMeterPower.value = ESPdata.ResSMDValues.SMDpower.toFixed(2);
-    if (ESPdata.ResSMDValues.SMDAccuraty) calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuraty.toFixed(2);
+    if (ESPdata.ResSMDValues.SMDAccuracy) calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuracy.toFixed(2);
     pushAllESPdataToCSVarray();
 }
 function formatDate(date) {    return date.getFullYear() + '/' +      (date.getMonth() + 1) + '/' +      date.getDate() + ' ' +      date.getHours() + ':' +      date.getMinutes() + ':' +
@@ -314,7 +314,7 @@ function DownloadCsv() {        const csvContent = allValuesToCSV.map(row =>    
 };
 function pushAllESPdataToCSVarray() {
     downloadCsvBtn.style["display"] = "";
-    var now = new Date();    allValuesToCSV.push([        formatDate(now),        timer.textContent,        currentTransformerTransformationRatioCheck.value,        constMeterImpsNumCheck.value,        meterSerialNumMeterCheck.value,        pzemVoltageMeterCheck1.value,        pzemVoltageMeterCheck2.value,        pzemVoltageMeterCheck3.value,        pzemCurrentMeterCheck1.value,        pzemCurrentMeterCheck2.value,        pzemCurrentMeterCheck3.value,        pzemPowerMeterCheck1.value,        pzemPowerMeterCheck2.value,        pzemPowerMeterCheck3.value,        pzemEnergyMeterCheck1.value,        pzemEnergyMeterCheck2.value,        pzemEnergyMeterCheck3.value,        pzemFrequencyMeterCheck1.value,        pzemFrequencyMeterCheck2.value,        pzemFrequencyMeterCheck3.value,        pzemPowerFactorMeterCheck1.value,        pzemPowerFactorMeterCheck2.value,        pzemPowerFactorMeterCheck3.value,        pzemFullCurrentCheck.value,        pzemFullPowerCheck.value,        pzemFullEnergyMeterCheck.value,        kyImpsMeterCheck.value,        impsPeriodMeterCheck.value,        calcMeterPower.value,
+    var now = new Date();    allValuesToCSV.push([        formatDate(now),        timer.textContent,        currentTransformerTransformationRatioCheck.value,        constMeterImpsNumCheck.value,        queueSizeCalcMeterAccuracyCheck.value,        meterSerialNumMeterCheck.value,        pzemVoltageMeterCheck1.value,        pzemVoltageMeterCheck2.value,        pzemVoltageMeterCheck3.value,        pzemCurrentMeterCheck1.value,        pzemCurrentMeterCheck2.value,        pzemCurrentMeterCheck3.value,        pzemPowerMeterCheck1.value,        pzemPowerMeterCheck2.value,        pzemPowerMeterCheck3.value,        pzemEnergyMeterCheck1.value,        pzemEnergyMeterCheck2.value,        pzemEnergyMeterCheck3.value,        pzemFrequencyMeterCheck1.value,        pzemFrequencyMeterCheck2.value,        pzemFrequencyMeterCheck3.value,        pzemPowerFactorMeterCheck1.value,        pzemPowerFactorMeterCheck2.value,        pzemPowerFactorMeterCheck3.value,        pzemFullCurrentCheck.value,        pzemFullPowerCheck.value,        pzemFullEnergyMeterCheck.value,        kyImpsMeterCheck.value,        impsPeriodMeterCheck.value,        calcMeterPower.value,
         calcMeterAccuracy.value]);
 }
 constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
@@ -337,7 +337,7 @@ function sendConstMeterImpsNumCheck() {
 currentTransformerTransformationRatioCheck.addEventListener("change", sendCurrentTransformerTransformationRatio);
 function sendCurrentTransformerTransformationRatio() {
     if (CheckCurrentTransformerTransformationRatioInputs()) {
-        var xhttp = new XMLHttpRequest();        xhttp.open("GET",            "current_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
+        var xhttp = new XMLHttpRequest();        xhttp.open("GET",            "current_transformer_transformation_ratio?currentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
             true);
         xhttp.responseType = "json";
         xhttp.send();
@@ -392,8 +392,8 @@ function Reset() {
     };
 };
 function startMeterCheck(e) {
-    if (StartMeterCheckBtn.innerText == 'Старт▶') {        if (CheckConstMeterImpsNumInputs()
-            && CheckCurrentTransformerTransformationRatioInputs()) {
+    if (StartMeterCheckBtn.innerText == 'Старт▶') {        if (CheckConstMeterImpsNumInputs()            && CheckCurrentTransformerTransformationRatioInputs()
+            && CheckQueueSizeCalcMeterAccuracyCheck()) {
             e.preventDefault();
             PZEMinterval = setInterval(getPZEMsData, ESPsurveyPeriod);
             timerInterval = setInterval(updateTime, 100);
@@ -425,7 +425,7 @@ function updateTime() {
 resetBtn.addEventListener('click', () => {
     clearInterval(PZEMinterval);
     setTimeout(() => {
-        console.log(" джём, пока придут последние значения с pzem");
+        console.log("ждём, пока придут последние значения с pzem");
       }, ESPsurveyPeriod + 100);
     clearInterval(timerInterval);
     Reset();
@@ -442,7 +442,7 @@ writeBtn.addEventListener("click", copyResult);
 function copyResult(e) {
     e.preventDefault();
     var inp = document.createElement('input');
-        var now = new Date();        inp.value = now + ';    \n\r\Номер ИПУ: ' + document.getElementById('SMDSerialNumMeterCheck').value + ';    \n\r\Время: ' + timer.textContent + ';    \n\r\Ктт = ' + сurrentTransformerTransformationRatioCheck.value + ' о.е.;    \n\r\U1 = ' + pzemVoltageMeterCheck1.value.toString() + ' В;    \n\r\I1 = ' + pzemCurrentMeterCheck1.value.toString() + ' A;    \n\r\U2 = ' + pzemVoltageMeterCheck2.value.toString() + ' В;    \n\r\I2 = ' + pzemCurrentMeterCheck2.value.toString() + ' A;    \n\r\U3 = ' + pzemVoltageMeterCheck3.value.toString() + ' В;    \n\r\I3 = ' + pzemCurrentMeterCheck3.value.toString() + ' A;    \n\r'+ calcMeterPower.textContent + ';    \n\r\A = ' + constMeterImpsNumCheck.value.toString() + ' имп/кВ*ч;   \n\r\
+        var now = new Date();        inp.value = now + ';    \n\r\Номер ИПУ: ' + document.getElementById('SMDSerialNumMeterCheck').value + ';    \n\r\Время: ' + timer.textContent + ';    \n\r\Ктт = ' + currentTransformerTransformationRatioCheck.value + ' о.е.;    \n\r\U1 = ' + pzemVoltageMeterCheck1.value.toString() + ' В;    \n\r\I1 = ' + pzemCurrentMeterCheck1.value.toString() + ' A;    \n\r\U2 = ' + pzemVoltageMeterCheck2.value.toString() + ' В;    \n\r\I2 = ' + pzemCurrentMeterCheck2.value.toString() + ' A;    \n\r\U3 = ' + pzemVoltageMeterCheck3.value.toString() + ' В;    \n\r\I3 = ' + pzemCurrentMeterCheck3.value.toString() + ' A;    \n\r'+ calcMeterPower.textContent + ';    \n\r\A = ' + constMeterImpsNumCheck.value.toString() + ' имп/кВ*ч;   \n\r\
 n = ' + kyImpsMeterCheck.value.toString() + ' имп;    \n\r';
     document.body.appendChild(inp);
     inp.select();

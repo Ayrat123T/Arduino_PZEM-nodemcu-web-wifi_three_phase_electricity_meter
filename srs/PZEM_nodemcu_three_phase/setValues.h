@@ -16,7 +16,7 @@ void SetPzem1Values() {
     pf1 = pzem1.pf();checkLedState();
     power1 = pzem1.power() / WtTokWtScale * currentTransformerTransformationRatio;checkLedState();
     power += power1;checkLedState();
-    energy1 = pzem1.energy() / WtTokWtScale * currentTransformerTransformationRatio;checkLedState();
+    energy1 = pzem1.energy() * currentTransformerTransformationRatio;checkLedState();
     energy += energy1;checkLedState();
   }
 }
@@ -35,7 +35,7 @@ void SetPzem2Values() {
     pf2 = pzem2.pf();checkLedState();
     power2 = pzem2.power() / WtTokWtScale * currentTransformerTransformationRatio;checkLedState();
     power += power2;checkLedState();
-    energy2 = pzem2.energy() / WtTokWtScale * currentTransformerTransformationRatio;checkLedState();
+    energy2 = pzem2.energy() * currentTransformerTransformationRatio;checkLedState();
     energy += energy2;checkLedState();
   }
 }
@@ -54,7 +54,7 @@ void SetPzem3Values() {
     pf3 = pzem3.pf();checkLedState();
     power3 = pzem3.power() / WtTokWtScale * currentTransformerTransformationRatio;checkLedState();
     power += power3;checkLedState();
-    energy3 = pzem3.energy() / WtTokWtScale * currentTransformerTransformationRatio;checkLedState();
+    energy3 = pzem3.energy() * currentTransformerTransformationRatio;checkLedState();
     energy += energy3;checkLedState();
   }
 }

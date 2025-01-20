@@ -34,12 +34,12 @@ std::string WebToStr(std::ifstream& index_html_in) {
 }
 
 std::string MakeStrFromWeb() {
-    std::ifstream index_html_in("index.html"); // окрываем файл для чтения
+    std::ifstream index_html_in("index.html"); // открываем файл для чтения
     std::string html = "const char webpage[] PROGMEM = R\"=====(";
     html += WebToStr(index_html_in);
     html += ")=====\";";
     const std::filesystem::path CurrentPath = std::filesystem::current_path().parent_path();
-    std::ofstream index_h_out(CurrentPath/ "srs/PZEM_nodemcu_three_phase/index.h"); // окрываем файл для записи
+    std::ofstream index_h_out(CurrentPath/ "srs/PZEM_nodemcu_three_phase/index.h"); // открываем файл для записи
     if (index_h_out.is_open()) {
         index_h_out << html;
     }

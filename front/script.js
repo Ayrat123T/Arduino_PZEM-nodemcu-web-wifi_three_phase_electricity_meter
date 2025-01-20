@@ -1,7 +1,7 @@
 let currentTransformerTransformationRatioCheck = document.getElementById('CurrentTransformerTransformationRatioCheck');
 let constMeterImpsNumCheck = document.getElementById('ConstMeterImpsNumCheck');
-let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
 let queueSizeCalcMeterAccuracyCheck = document.getElementById('QueueSizeCalcMeterAccuracyCheck');
+let meterSerialNumMeterCheck = document.getElementById('SMDSerialNumMeterCheck');
 
 let pzemVoltageMeterCheck1 = document.getElementById('PzemVoltageMeterCheck1');
 let pzemVoltageMeterCheck2 = document.getElementById('PzemVoltageMeterCheck2');
@@ -83,6 +83,7 @@ let allValuesToCSV = [[
     'timer',
     'currentTransformerTransformationRatio',
     'constMeterImpsNum',
+    'queueSizeCalcMeterAccuracy',
     'meterSerialNum',
     'pzemVoltage1',
     'pzemVoltage2',
@@ -141,7 +142,7 @@ function ViewAllESPdata(ESPdata) {
     kyImpsMeterCheck.value = ESPdata.ResSMDValues.KYimpNumSumm;
     if (ESPdata.ResSMDValues.SMDimpPeriod) impsPeriodMeterCheck.value = ESPdata.ResSMDValues.SMDimpPeriod.toFixed(2);
     if (ESPdata.ResSMDValues.SMDpower) calcMeterPower.value = ESPdata.ResSMDValues.SMDpower.toFixed(2);
-    if (ESPdata.ResSMDValues.SMDAccuraty) calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuraty.toFixed(2);
+    if (ESPdata.ResSMDValues.SMDAccuracy) calcMeterAccuracy.value = ESPdata.ResSMDValues.SMDAccuracy.toFixed(2);
     pushAllESPdataToCSVarray();
 }
 
@@ -185,6 +186,7 @@ function pushAllESPdataToCSVarray() {
         timer.textContent,
         currentTransformerTransformationRatioCheck.value,
         constMeterImpsNumCheck.value,
+        queueSizeCalcMeterAccuracyCheck.value,
         meterSerialNumMeterCheck.value,
         pzemVoltageMeterCheck1.value,
         pzemVoltageMeterCheck2.value,
