@@ -39,10 +39,10 @@ PZEM004Tv30 pzem3(D7, D0); // (RX,TX) подключиться к TX,RX PZEM3
   float frequency3= 0;
   float pf3= 0;
 
-int constMeterImpsNum = 1000;                  // постояннная счётчика
-float SMDAccuraty = 100;                       // Погрешность счётчика
+int constMeterImpsNum = 1000;                  // постоянная счётчика
+float SMDAccuracy = 100;                       // Погрешность счётчика
 int WtTokWtScale = 1000;                       // коэффициент перевода Вт в кВт
-int сurrentTransformerTransformationRatio = 1; // коэффициент трансформации трансформтора тока
+int currentTransformerTransformationRatio = 1; // коэффициент трансформации трансформатора тока
 
 int KYimpNumSumm = 0;                          // текущее кол-во импульсов
 int winHi = 0, winLo = 1024;                   // пределы гистерезиса

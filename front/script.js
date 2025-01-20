@@ -72,7 +72,7 @@ function CheckCurrentTransformerTransformationRatioInputs() {
 function CheckQueueSizeCalcMeterAccuracyCheck() {
     if (queueSizeCalcMeterAccuracyCheck.value == ''
         || queueSizeCalcMeterAccuracyCheck.value <= 0) {
-            alert('Кол-во импульсов должно быть больше 0');
+            alert('Кол-во последовательных импульсов, которые будут учитываться при расчёте погрешности, должно быть больше 0');
             return false;
         }
     return true;
@@ -238,7 +238,7 @@ function sendCurrentTransformerTransformationRatio() {
     if (CheckCurrentTransformerTransformationRatioInputs()) {
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET",
-            "current_transformer_transformation_ratio?сurrentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
+            "current_transformer_transformation_ratio?currentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
             true);
         xhttp.responseType = "json";
         xhttp.send();
@@ -302,7 +302,8 @@ function Reset() {
 function startMeterCheck(e) {
     if (StartMeterCheckBtn.innerText == 'Старт▶') {
         if (CheckConstMeterImpsNumInputs()
-            && CheckCurrentTransformerTransformationRatioInputs()) {
+            && CheckCurrentTransformerTransformationRatioInputs()
+            && CheckQueueSizeCalcMeterAccuracyCheck()) {
             e.preventDefault();
             PZEMinterval = setInterval(getPZEMsData, ESPsurveyPeriod);
             timerInterval = setInterval(updateTime, 100);
@@ -337,7 +338,7 @@ function updateTime() {
 resetBtn.addEventListener('click', () => {
     clearInterval(PZEMinterval);
     setTimeout(() => {
-        console.log(" джём, пока придут последние значения с pzem");
+        console.log("ждём, пока придут последние значения с pzem");
       }, ESPsurveyPeriod + 100);
     clearInterval(timerInterval);
     Reset();
@@ -360,7 +361,7 @@ function copyResult(e) {
         inp.value = now + ';    \n\r\
 Номер ИПУ: ' + document.getElementById('SMDSerialNumMeterCheck').value + ';    \n\r\
 Время: ' + timer.textContent + ';    \n\r\
-Ктт = ' + сurrentTransformerTransformationRatioCheck.value + ' о.е.;    \n\r\
+Ктт = ' + currentTransformerTransformationRatioCheck.value + ' о.е.;    \n\r\
 U1 = ' + pzemVoltageMeterCheck1.value.toString() + ' В;    \n\r\
 I1 = ' + pzemCurrentMeterCheck1.value.toString() + ' A;    \n\r\
 U2 = ' + pzemVoltageMeterCheck2.value.toString() + ' В;    \n\r\

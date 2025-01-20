@@ -1,7 +1,4 @@
 #pragma once
-#include <execution>
-#include <algorithm>
-#include <cmath>
 #include "values.h"
 
 void checkLedState();
@@ -9,23 +6,6 @@ void initWindow();
 void findAnalogWindow(int analogData);
 void checkLogic(int analogData);
 void closeAnalogWindow();
-
-// возвращает среднее арифметическое
-template <typename ExecutionPolicy, typename IteratorRange>
-double GetArithmeticMean(ExecutionPolicy&& Policy, IteratorRange begin, IteratorRange end) {
-    double res = std::reduce(Policy, begin, end);
-    int sum = (end - begin);
-    return res / sum;
-}
-
-// возвращает стандартное отклонение
-template <typename ExecutionPolicy, typename IteratorRange>
-double GetStandardDeviation(ExecutionPolicy&& Policy, IteratorRange begin, IteratorRange end) {
-    double arithmetic_mean = GetArithmeticMean(Policy, begin, end);
-    return std::sqrt(std::transform_reduce(Policy, begin, end, 0.0, std::plus{}, [&arithmetic_mean](const auto delt) { // среднеквадратичное отклонение
-        return pow(arithmetic_mean - delt, 2);
-        }) / (end - begin - 1));
-}
 
 void checkLedState() {
   yield();
@@ -48,7 +28,7 @@ void checkLedState() {
         meterBlinkPeriod = queueSum / meterBlinkPeriods.size();
     }
     meterWattage = 3600 / meterBlinkPeriod  / constMeterImpsNum; // нагрузка (кВт) = кол-во таких импульсов в часе разделить на имп за 1кВт*ч
-    if (power) SMDAccuraty = (power - meterWattage) / power * 100;
+    if (power) SMDAccuracy = (power - meterWattage) / power * 100;
     Serial.println(meterBlinkPeriod);
     microTimer = micros();                            // запоминаем время этого перехода в таймер
     // вычисление длины последнего импульса   
@@ -69,7 +49,7 @@ void initWindow() {
     delay(1000);
     Serial.print(" . ");
   }
-  Serial.println("initialization light window complited");
+  Serial.println("initialization light window complete");
 }
 
 void findAnalogWindow(int analogData) {

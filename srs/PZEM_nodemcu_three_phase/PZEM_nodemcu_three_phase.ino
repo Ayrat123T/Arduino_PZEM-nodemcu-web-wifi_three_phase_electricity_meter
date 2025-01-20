@@ -64,7 +64,7 @@ void SendPzemsValues() {
     ResSMDValues["KYimpNumSumm"] = KYimpNumSumm;checkLedState();
     ResSMDValues["SMDimpPeriod"] = meterBlinkPeriod;checkLedState();
     ResSMDValues["SMDpower"] = meterWattage;checkLedState();
-    ResSMDValues["SMDAccuraty"] = SMDAccuraty;checkLedState();
+    ResSMDValues["SMDAccuracy"] = SMDAccuracy;checkLedState();
   server.send(200, "application/json", doc.as<String>());checkLedState();
   yield();checkLedState();
 }
@@ -75,9 +75,9 @@ void SetConstMeterImpsNum() {
   SendPzemsValues();
 }
 
-void SetСurrentTransformerTransformationRatio() {
-  String СurrentTransformerTransformationRatioStr = server.arg("сurrentTransformerTransformationRatio");
-  сurrentTransformerTransformationRatio = СurrentTransformerTransformationRatioStr.toInt();
+void SetCurrentTransformerTransformationRatio() {
+  String CurrentTransformerTransformationRatioStr = server.arg("currentTransformerTransformationRatio");
+  currentTransformerTransformationRatio = CurrentTransformerTransformationRatioStr.toInt();
   SendPzemsValues();
 }
 
@@ -92,7 +92,7 @@ void Reset() {
   winHi = 0, winLo = 1024;
   meterWattage = 0;
   constMeterImpsNum = 1000; 
-  сurrentTransformerTransformationRatio = 1;
+  currentTransformerTransformationRatio = 1;
   if (pzem1.resetEnergy() &&
       pzem2.resetEnergy() &&
       pzem3.resetEnergy()) {
@@ -178,7 +178,7 @@ void setup() {
 
   // Настройка HTTP-сервера
 	server.on("/", handleRoot);
-  server.on("/current_transformer_transformation_ratio", SetСurrentTransformerTransformationRatio);
+  server.on("/current_transformer_transformation_ratio", SetCurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
   server.on("/queue_size_calc_meter_accuracy_check", SetQueueSizeCalcMeterAccuracyCheck);
   server.on("/pzem_values", SendPzemsValues);
