@@ -10,6 +10,12 @@
 #define ANALOG_PIN A0
 #define CLOSE_WIN_FACTOR 10             // 1/CLOSE_WIN_FACTOR для сужения окна с каждой стороны
 
+const char *ap_ssid = APSSID;
+const char* ssid = STASSID;
+const char* password = STAPSK;
+//const char* ssid2 = STASSID2;
+//const char* password2 = STAPSK2;
+
 PZEM004Tv30 pzem1(D1, D2); // (RX,TX) подключиться к TX,RX PZEM1
 PZEM004Tv30 pzem2(D5, D6); // (RX,TX) подключиться к TX,RX PZEM2
 PZEM004Tv30 pzem3(D7, D0); // (RX,TX) подключиться к TX,RX PZEM3
@@ -66,6 +72,7 @@ void resetCurrentValues() {
   queueSize = 1;
   KYimpNumSumm = 0;
   winHi = 0, winLo = 1024;
+  initWindow();
   meterWattage = 0;
   constMeterImpsNum = 1000;
   yield();

@@ -161,7 +161,7 @@ downloadCsvBtn.addEventListener("click", DownloadCsv);
 function DownloadCsv() {
         const csvContent = allValuesToCSV.map(row => 
             row.map(field => 
-                `"${field.toString().replace(/"/g, '""')}"`
+                `"${field.toString().replace(".",",").replace(/"/g, '""')}"`
             ).join(";")
         ).join("\n");
     
@@ -221,16 +221,17 @@ function sendConstMeterImpsNumCheck() {
     if (CheckConstMeterImpsNumInputs()) {
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
-        xhttp.responseType = "json";
+        xhttp.responseType = "text";
         xhttp.send();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 console.log("sendConstMeterImpsNumCheck successful✔️\n\r");
             }
         };
-        xhttp.onload = function () {
-            ViewAllESPdata(xhttp.response);
-        };
+        /*xhttp.onload = function () {
+            console.log(this.responseText);
+            //ViewAllESPdata(xhttp.response);
+        };*/
     }
 };
 
@@ -242,16 +243,17 @@ function sendCurrentTransformerTransformationRatio() {
         xhttp.open("GET",
             "current_transformer_transformation_ratio?currentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
             true);
-        xhttp.responseType = "json";
+        xhttp.responseType = "text";
         xhttp.send();
         xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
-        }
+            if (this.readyState == 4 && this.status == 200) {
+                console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
+            }
         };
-        xhttp.onload = function () {
-            ViewAllESPdata(xhttp.response);
-        };
+        /*xhttp.onload = function () {
+            console.log(this.responseText);
+            //ViewAllESPdata(xhttp.response);
+        };*/
     }
 };
 
@@ -261,18 +263,19 @@ function sendQueueSizeCalcMeterAccuracyCheck() {
     if (CheckQueueSizeCalcMeterAccuracyCheck()) {
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET",
-            "queue_size_calc_meter_accuracy_check?queueSizeCalcMeterAccuracyCheck="+queueSizeCalcMeterAccuracyCheck.value,
+            "queue_size_calc_meter_accuracy?queueSizeCalcMeterAccuracy="+queueSizeCalcMeterAccuracyCheck.value,
             true);
-        xhttp.responseType = "json";
+        xhttp.responseType = "text";
         xhttp.send();
         xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log("sendQueueSizeCalcMeterAccuracyCheck successful✔️\n\r");
-        }
+            if (this.readyState == 4 && this.status == 200) {
+                console.log("sendQueueSizeCalcMeterAccuracyCheck successful✔️\n\r");
+            }
         };
-        xhttp.onload = function () {
-            ViewAllESPdata(xhttp.response);
-        };
+        /*xhttp.onload = function () {
+            console.log(this.responseText);
+            //ViewAllESPdata(xhttp.response);
+        };*/
     }
 };
 

@@ -13,12 +13,6 @@
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);
 
-const char *ap_ssid = APSSID;
-const char* ssid = STASSID;
-const char* password = STAPSK;
-//const char* ssid2 = STASSID2;
-//const char* password2 = STAPSK2;
-
 void SendPzemsValues() {
   yield();checkLedState();// костыльно решаем проблему многозадачности
   current = 0;checkLedState();
@@ -65,9 +59,7 @@ void SendPzemsValues() {
     ResSMDValues["SMDimpPeriod"] = meterBlinkPeriod;checkLedState();
     if (printSMDAccuracy) {
       ResSMDValues["SMDpower"] = meterWattage;checkLedState();
-      if (power && meterWattage) {
-        ResSMDValues["SMDAccuracy"] = (power - meterWattage) / power * 100;checkLedState();
-      }
+      if (power) ResSMDValues["SMDAccuracy"] = (power - meterWattage) / power * 100;checkLedState();
       printSMDAccuracy = false;
     }
     //if (!printSMDAccuracy) meterWattage = NULL;
@@ -87,21 +79,24 @@ void SendPzemsValues() {
 void SetConstMeterImpsNum() {
   String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
   constMeterImpsNum = constMeterImpsNumStr.toInt();
-  SendPzemsValues();
+  //server.send(200, "text/plane", "constMeterImpsNumVal has been set");
+  //SendPzemsValues();
 }
 
 void SetCurrentTransformerTransformationRatio() {
   String CurrentTransformerTransformationRatioStr = server.arg("currentTransformerTransformationRatio");
   currentTransformerTransformationRatio = CurrentTransformerTransformationRatioStr.toInt();
-  SendPzemsValues();
+  //server.send(200, "text/plane", "currentTransformerTransformationRatio has been set");
+  //SendPzemsValues();
 }
 
-void SetQueueSizeCalcMeterAccuracyCheck() {
+void SetQueueSizeCalcMeterAccuracy() {
   queueSum = 0;
   printSMDAccuracy = false;
-  String queueSizeCalcMeterAccuracyCheckStr = server.arg("queueSizeCalcMeterAccuracyCheck");
+  String queueSizeCalcMeterAccuracyCheckStr = server.arg("queueSizeCalcMeterAccuracy");
   queueSize = queueSizeCalcMeterAccuracyCheckStr.toInt();
-  SendPzemsValues();
+  //server.send(200, "text/plane", "queueSizeCalcMeterAccuracy has been set");
+  //SendPzemsValues();
 }
 
 void Reset() {
@@ -194,7 +189,7 @@ void setup() {
 	server.on("/", handleRoot);
   server.on("/current_transformer_transformation_ratio", SetCurrentTransformerTransformationRatio);
   server.on("/const_meter_imps_num", SetConstMeterImpsNum);
-  server.on("/queue_size_calc_meter_accuracy_check", SetQueueSizeCalcMeterAccuracyCheck);
+  server.on("/queue_size_calc_meter_accuracy", SetQueueSizeCalcMeterAccuracy);
   server.on("/pzem_values", SendPzemsValues);
   server.on("/reset", Reset);
 	server.onNotFound(handle_NotFound);
