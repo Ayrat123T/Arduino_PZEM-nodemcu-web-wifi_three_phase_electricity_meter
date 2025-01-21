@@ -316,55 +316,49 @@ function pushAllESPdataToCSVarray() {
     var now = new Date();    allValuesToCSV.push([        formatDate(now),        timer.textContent,        currentTransformerTransformationRatioCheck.value,        constMeterImpsNumCheck.value,        queueSizeCalcMeterAccuracyCheck.value,        meterSerialNumMeterCheck.value,        pzemVoltageMeterCheck1.value,        pzemVoltageMeterCheck2.value,        pzemVoltageMeterCheck3.value,        pzemCurrentMeterCheck1.value,        pzemCurrentMeterCheck2.value,        pzemCurrentMeterCheck3.value,        pzemPowerMeterCheck1.value,        pzemPowerMeterCheck2.value,        pzemPowerMeterCheck3.value,        pzemEnergyMeterCheck1.value,        pzemEnergyMeterCheck2.value,        pzemEnergyMeterCheck3.value,        pzemFrequencyMeterCheck1.value,        pzemFrequencyMeterCheck2.value,        pzemFrequencyMeterCheck3.value,        pzemPowerFactorMeterCheck1.value,        pzemPowerFactorMeterCheck2.value,        pzemPowerFactorMeterCheck3.value,        pzemFullCurrentCheck.value,        pzemFullPowerCheck.value,        pzemFullEnergyMeterCheck.value,        kyImpsMeterCheck.value,        impsPeriodMeterCheck.value,        calcMeterPower.value,
         calcMeterAccuracy.value]);
 }
-constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
-function sendConstMeterImpsNumCheck() {
-    if (CheckConstMeterImpsNumInputs()) {
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
-        xhttp.responseType = "text";
-        xhttp.send();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log("sendConstMeterImpsNumCheck successful✔️\n\r");
-            }
-        };
-        /*xhttp.onload = function () {
-            console.log(this.responseText);
-            //ViewAllESPdata(xhttp.response);        };*/
-    }
-};
 currentTransformerTransformationRatioCheck.addEventListener("change", sendCurrentTransformerTransformationRatio);
 function sendCurrentTransformerTransformationRatio() {
     if (CheckCurrentTransformerTransformationRatioInputs()) {
-        var xhttp = new XMLHttpRequest();        xhttp.open("GET",            "current_transformer_transformation_ratio?currentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
+        var xhttp = new XMLHttpRequest();        xhttp.open("POST",            "current_transformer_transformation_ratio?currentTransformerTransformationRatio="+currentTransformerTransformationRatioCheck.value,
             true);
-        xhttp.responseType = "text";
+        xhttp.setRequestHeader("Content-Type", "text; charset=UTF-8");
         xhttp.send();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 console.log("sendCurrentTransformerTransformationRatio successful✔️\n\r");
+                console.log(this.responseText);
             }
         };
-        /*xhttp.onload = function () {
-            console.log(this.responseText);
-            //ViewAllESPdata(xhttp.response);        };*/
+    }
+};
+constMeterImpsNumCheck.addEventListener("change", sendConstMeterImpsNumCheck);
+function sendConstMeterImpsNumCheck() {
+    if (CheckConstMeterImpsNumInputs()) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "const_meter_imps_num?constMeterImpsNumVal="+constMeterImpsNumCheck.value, true);
+        xhttp.setRequestHeader("Content-Type", "text; charset=UTF-8");
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                console.log("sendConstMeterImpsNumCheck successful✔️\n\r");
+            }
+        };
     }
 };
 queueSizeCalcMeterAccuracyCheck.addEventListener("change", sendQueueSizeCalcMeterAccuracyCheck);
 function sendQueueSizeCalcMeterAccuracyCheck() {
     if (CheckQueueSizeCalcMeterAccuracyCheck()) {
-        var xhttp = new XMLHttpRequest();        xhttp.open("GET",            "queue_size_calc_meter_accuracy?queueSizeCalcMeterAccuracy="+queueSizeCalcMeterAccuracyCheck.value,
+        var xhttp = new XMLHttpRequest();        xhttp.open("POST",            "queue_size_calc_meter_accuracy?queueSizeCalcMeterAccuracy="+queueSizeCalcMeterAccuracyCheck.value,
             true);
-        xhttp.responseType = "text";
+        xhttp.setRequestHeader("Content-Type", "text; charset=UTF-8");
         xhttp.send();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 console.log("sendQueueSizeCalcMeterAccuracyCheck successful✔️\n\r");
+                console.log(this.responseText);
             }
         };
-        /*xhttp.onload = function () {
-            console.log(this.responseText);
-            //ViewAllESPdata(xhttp.response);        };*/
     }
 };
 function getPZEMsData() {

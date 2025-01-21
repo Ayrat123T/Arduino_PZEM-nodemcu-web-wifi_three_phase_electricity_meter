@@ -58,3 +58,19 @@ void SetPzem3Values() {
     energy += energy3;checkLedState();
   }
 }
+
+void resetCurrentValues() {
+  yield();
+  current = 0;
+  power = 0;
+  energy = 0;
+  queueSum = 0;
+  while (!meterBlinkPeriods.empty()) meterBlinkPeriods.pop();
+  queueSize = 1;
+  KYimpNumSumm = 0;
+  winHi = 0, winLo = 1024;
+  initWindow();
+  meterWattage = 0;
+  constMeterImpsNum = 1000;
+  yield();
+}

@@ -79,15 +79,13 @@ void SendPzemsValues() {
 void SetConstMeterImpsNum() {
   String constMeterImpsNumStr = server.arg("constMeterImpsNumVal");
   constMeterImpsNum = constMeterImpsNumStr.toInt();
-  //server.send(200, "text/plane", "constMeterImpsNumVal has been set");
-  //SendPzemsValues();
+  server.send(200, "text/plane", "constMeterImpsNumVal has been set");
 }
 
 void SetCurrentTransformerTransformationRatio() {
   String CurrentTransformerTransformationRatioStr = server.arg("currentTransformerTransformationRatio");
   currentTransformerTransformationRatio = CurrentTransformerTransformationRatioStr.toInt();
-  //server.send(200, "text/plane", "currentTransformerTransformationRatio has been set");
-  //SendPzemsValues();
+  server.send(200, "text/plane", "currentTransformerTransformationRatio has been set");
 }
 
 void SetQueueSizeCalcMeterAccuracy() {
@@ -95,8 +93,7 @@ void SetQueueSizeCalcMeterAccuracy() {
   printSMDAccuracy = false;
   String queueSizeCalcMeterAccuracyCheckStr = server.arg("queueSizeCalcMeterAccuracy");
   queueSize = queueSizeCalcMeterAccuracyCheckStr.toInt();
-  //server.send(200, "text/plane", "queueSizeCalcMeterAccuracy has been set");
-  //SendPzemsValues();
+  server.send(200, "text/plane", "queueSizeCalcMeterAccuracy has been set");
 }
 
 void Reset() {
