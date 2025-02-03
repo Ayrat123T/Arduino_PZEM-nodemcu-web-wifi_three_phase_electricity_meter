@@ -45,7 +45,7 @@ let minutes = 0;
 let hours = 0;
 let PZEMinterval;
 let timerInterval;
-let ESPsurveyPeriod = 1000; // период опроса ESP
+let ESPsurveyPeriod = 1000; // период опроса ESP в мс
 let StartMeterCheckBtn = document.getElementById('StartMeterCheck');
 let resetBtn = document.getElementById('resetMeterCheck');
 

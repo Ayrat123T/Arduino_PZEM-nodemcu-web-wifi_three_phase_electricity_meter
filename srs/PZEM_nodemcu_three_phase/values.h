@@ -3,10 +3,10 @@
 #include <PZEM004Tv30.h>
 
 #define APSSID "SmartGridComMeterESPap" // Имя точки доступа, которую создаст ESP
-#define STASSID "Redmi_DF75"            // Точка доступа (логин и пароль от wifi), к которой подключится ESP
-#define STAPSK "51194303" 
+#define STASSID "admin"            // Точка доступа (логин и пароль от wifi), к которой подключится ESP
+#define STAPSK "admin_pass" 
 #define STASSID2 "Admin"
-#define STAPSK2 "123456789" 
+#define STAPSK2 "AdminPass" 
 #define ANALOG_PIN A0
 #define CLOSE_WIN_FACTOR 10             // 1/CLOSE_WIN_FACTOR для сужения окна с каждой стороны
 
@@ -55,7 +55,7 @@ int winHi = 0, winLo = 1024;                   // пределы гистере�
 int dataCur;                                   // временное хранение текущих данных фоторезистора
 unsigned long microTimer;                      // Стоп-таймер в микросекундах
 double meterBlinkPeriod;                       // Период моргания счётчика
-std::queue<double> meterBlinkPeriods;              // Очередь из последних периодов моргания счётчика    
+std::queue<double> meterBlinkPeriods;          // Очередь из последних периодов моргания счётчика    
 size_t queueSize = 1;
 double queueSum = 0; 
 boolean ledState, ledStateOld;                 // текущее логическое состояние фоторезистора

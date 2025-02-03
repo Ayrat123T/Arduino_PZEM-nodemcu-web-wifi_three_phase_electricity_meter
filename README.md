@@ -32,6 +32,7 @@ http://arduino.esp8266.com/stable/package_esp8266com_index.json
 
 ### веб интерфейс:
 ![alt text](Resources/front.png)
+![alt text](image.png)
 
 ### можно выводить в монитор порта:
 ![alt text](Resources/image-1.png)

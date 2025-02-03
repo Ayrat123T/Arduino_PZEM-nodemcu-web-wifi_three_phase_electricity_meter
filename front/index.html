@@ -86,8 +86,10 @@
             <table class="input"><tr><td><label id="CalcMeterAccuracyLabel" class="labelMeterCheck">Погрешность[%] = </label>
                 <input id="CalcMeterAccuracyCheck" type="number" class="inputMeterCheck" name="CalcMeterAccuracyCheck" title="Погрешность счётчика" required readonly/></td></tr></table>
              </p>
-                <p><button id="StartMeterCheck" type="submit" class="button" name="StartMeterCheck">Старт▶</button>
-                    <button type="reset" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
+             <div id="bottomNavbar">
+                <button type="submit" id="StartMeterCheck" title="Начать замер">Старт▶</button>
+                <button type="reset" id="resetMeterCheck" title="Сброс">↩︎Сброс</button>
+            </div>
         </form>
         <button id = "copyResultButton"
         name = "copyResultButton"

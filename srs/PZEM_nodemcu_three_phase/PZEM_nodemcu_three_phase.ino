@@ -152,7 +152,7 @@ void setup() {
   //wifiMulti.addAP(ssid2, password2);
   Serial.println("");
   Serial.print("Connecting");
-  // Ожидаем подключения
+  // Ожидаем подключения в течении 5 секунд
   unsigned long connectionTimer = millis() + 5000;
   while (millis() < connectionTimer && wifiMulti.run() != WL_CONNECTED) { 
     if (wifiMulti.run() != WL_CONNECTED) {
@@ -168,7 +168,7 @@ void setup() {
     Serial.println(WiFi.SSID());
     Serial.print("IP address: "); //http://192.168.31.146/
     Serial.println(WiFi.localIP());  // IP-адрес, назначенный ESP
-  } else {
+  } else { //если подключения нет, создаём свою точку доступа
     // раздел добавления точки доступа wifi
     WiFi.mode(WIFI_AP);
     Serial.println("Configuring access point...");

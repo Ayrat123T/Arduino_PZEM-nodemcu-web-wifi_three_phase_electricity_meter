@@ -81,7 +81,7 @@ input:hover {
 .inputRadio {
     font-size: 20pt;
 }
-.button {
+button {
     border-radius: 10px;
     height: 100%;
     margin: 1%;
@@ -189,8 +189,10 @@ input[type="checkbox"] {
             <table class="input"><tr><td><label id="CalcMeterAccuracyLabel" class="labelMeterCheck">Погрешность[%] = </label>
                 <input id="CalcMeterAccuracyCheck" type="number" class="inputMeterCheck" name="CalcMeterAccuracyCheck" title="Погрешность счётчика" required readonly/></td></tr></table>
              </p>
-                <p><button id="StartMeterCheck" type="submit" class="button" name="StartMeterCheck">Старт▶</button>
-                    <button type="reset" class="button" id="resetMeterCheck">↩︎ Сброс</button></p>
+             <div id="bottomNavbar">
+                <button type="submit" id="StartMeterCheck" title="Начать замер">Старт▶</button>
+                <button type="reset" id="resetMeterCheck" title="Сброс">↩︎Сброс</button>
+            </div>
         </form>        <button id = "copyResultButton"        name = "copyResultButton"        class = "button"
         style="display: none">📋 Скопировать результат</button>        <button id = "downloadCsvButton"        name = "downloadCsvButton"        class = "button"
         style="display: none">💾 Экспорт в csv</button>
@@ -233,7 +235,7 @@ let seconds = 0.0;
 let minutes = 0;
 let hours = 0;
 let PZEMinterval;
-let timerInterval;let ESPsurveyPeriod = 1000; // период опроса ESP
+let timerInterval;let ESPsurveyPeriod = 1000; // период опроса ESP в мс
 let StartMeterCheckBtn = document.getElementById('StartMeterCheck');
 let resetBtn = document.getElementById('resetMeterCheck');
 StartMeterCheckBtn.addEventListener('click', startMeterCheck);

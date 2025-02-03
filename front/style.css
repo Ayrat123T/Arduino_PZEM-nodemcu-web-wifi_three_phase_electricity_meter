@@ -84,7 +84,7 @@ input:hover {
     font-size: 20pt;
 }
 
-.button {
+button {
     border-radius: 10px;
     height: 100%;
     margin: 1%;
